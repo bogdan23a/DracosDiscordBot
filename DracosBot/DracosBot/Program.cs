@@ -149,7 +149,7 @@ namespace DracosBot
         //Connected
         private static Task Connected()
         {
-            Console.Title = "Music Bot (Connected)";
+            //Console.Title = "Music Bot (Connected)";
 
             Print("Connected!", ConsoleColor.Green);
             return Task.CompletedTask;

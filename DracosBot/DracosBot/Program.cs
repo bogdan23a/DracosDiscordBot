@@ -97,9 +97,10 @@ namespace DracosBot
 
         private async Task MessageReceived(SocketMessage message)
         {
-            if(message.Content == "!ping")
+            switch (message.Content)
             {
-                await message.Channel.SendMessageAsync("Pong!");
+                case "!ping": { await message.Channel.SendMessageAsync("Pong!"); } break;
+                case "!robert": { await message.Channel.SendMessageAsync("Muie Robert astazi si maine 2017 and forever"); }break;
             }
         }
         private Task Log(LogMessage msg)

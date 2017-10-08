@@ -101,6 +101,7 @@ namespace DracosBot
             {
                 case "!ping": { await message.Channel.SendMessageAsync("Pong!"); } break;
                 case "!robert": { await message.Channel.SendMessageAsync("Muie Robert astazi si maine 2017 and forever"); }break;
+                case "!fuck": { await message.Channel.SendMessageAsync("the police"); } break;
             }
         }
         private Task Log(LogMessage msg)

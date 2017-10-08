@@ -131,8 +131,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Command.cs" />
+    <Compile Include="PingCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RobertCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

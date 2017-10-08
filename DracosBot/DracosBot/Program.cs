@@ -9,18 +9,28 @@ using Discord;
 using Discord.WebSocket;
 
 namespace DracosBot
-{
+{  
+
     class Program
     {
         private DiscordSocketClient _client;
+
+
+        //9GagSubBot 9gagBot;
         static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
         
+        public static void Print(string message,ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
         public async Task MainAsync()
         {
             _client = new DiscordSocketClient();
 
             _client.Log += Log;
-            _client.MessageReceived += MessageReceived;
+            _client.MessageReceived += OnMessageReceived;
 
             //TOKEN STORING LOGIC 
             //Store the token in a txt file to avoid hardcoding it 
@@ -95,17 +105,20 @@ namespace DracosBot
             await Task.Delay(-1);
         }
 
+        private Task OnMessageReceived(SocketMessage message)
+        {
+            MessageReceived(message);
+            return Task.CompletedTask;
+        }
         private async Task MessageReceived(SocketMessage message)
         {
-            switch (message.Content)
-            {
-                case "!ping": { await message.Channel.SendMessageAsync("Pong!"); } break;
-                case "!robert":
-                case "!robi":
-                case "!sorica":
-                case "!sorik": { await message.Channel.SendMessageAsync("Muie Robert astazi si maine 2017 and forever"); }break;
-                case "!fuck": { await message.Channel.SendMessageAsync("the police"); } break;
-            }
+            Print($"User \"{message.Author}\" wrote: \"{message.Content}\"", ConsoleColor.Magenta);
+            Console.WriteLine(Command.PING_COMMAND);
+            if (message.Content == Command.PING_COMMAND)
+                await message.Channel.SendMessageAsync(Command.PING_ANSWER);
+            else 
+            if(Command.isCommand(Command.ROBERT_COMMAND, message.Content))
+                await message.Channel.SendMessageAsync(Command.ROBERT_ANSWER);
         }
         private Task Log(LogMessage msg)
         {

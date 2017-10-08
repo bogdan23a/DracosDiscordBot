@@ -1,18 +1,23 @@
-﻿using System;
+﻿using Discord;
+using Discord.Audio;
+using Discord.Rest;
+using Discord.WebSocket;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-
-using Discord;
-using Discord.WebSocket;
 
 namespace DracosBot
 {  
 
-    class Program
+    class Program  
     {
+        private IVoiceChannel _voiceChannel;
+        private ITextChannel _textChannel;
+        private IAudioClient _audio;
         private DiscordSocketClient _client;
 
 
@@ -32,6 +37,12 @@ namespace DracosBot
             _client.Log += Log;
             _client.MessageReceived += OnMessageReceived;
 
+            //-
+            _client.Disconnected += Disconnected;
+
+            //+
+            _client.Connected += Connected;
+            _client.Ready += OnReady;
             //TOKEN STORING LOGIC 
             //Store the token in a txt file to avoid hardcoding it 
             //User confirmation needed
@@ -104,7 +115,7 @@ namespace DracosBot
             //Block this task until the program is closed
             await Task.Delay(-1);
         }
-
+        //Pass MessageReceived Event on to Async Method (so nothing blocks)
         private Task OnMessageReceived(SocketMessage message)
         {
             MessageReceived(message);
@@ -125,5 +136,75 @@ namespace DracosBot
             Console.WriteLine(msg.ToString());
             return Task.CompletedTask;
         }
+
+        #region Events
+
+        //Connection Lost
+        private static Task Disconnected(Exception arg)
+        {
+            Print($"Connection lost! ({arg.Message})", ConsoleColor.Red);
+            return Task.CompletedTask;
+        }
+
+        //Connected
+        private static Task Connected()
+        {
+            Console.Title = "Music Bot (Connected)";
+
+            Print("Connected!", ConsoleColor.Green);
+            return Task.CompletedTask;
+        }
+
+
+        //Pass Ready Event on to Async Method (so nothing blocks)
+        private Task OnReady()
+        {
+            Ready();
+            return Task.CompletedTask;
+        }
+
+        //On Bot ready
+        private async void Ready()
+        {
+            Print("Ready!", ConsoleColor.Green);
+
+            //"Playing Nothing :/"
+            await _client.SetGameAsync("Nothing :/");
+
+            //Get Guilds / Servers
+            try
+            {
+                //Server
+                PrintServers();
+                SocketGuild guild = _client.Guilds.FirstOrDefault(g => g.Name == Information.ServerName);
+
+                //Text Channel
+                _textChannel = guild.TextChannels.FirstOrDefault(t => t.Name == Information.TextChannelName);
+                Print($"Using Text Channel: \"#{_textChannel.Name}\"", ConsoleColor.Cyan);
+
+                //Voice Channel
+                _voiceChannel = guild.VoiceChannels.FirstOrDefault(t => t.Name == Information.VoiceChannelName);
+                Print($"Using Voice Channel: \"{_voiceChannel.Name}\"", ConsoleColor.Cyan);
+                _audio = await _voiceChannel.ConnectAsync();
+            }
+            catch (Exception e)
+            {
+                Print("Could not join Voice/Text Channel (" + e.Message + ")", ConsoleColor.Red);
+            }
+        }
+        private void PrintServers()
+        {
+            //Print added Servers
+            Print("\n\rAdded Servers:", ConsoleColor.Cyan);
+            foreach (SocketGuild server in _client.Guilds)
+            {
+                Print(server.Name == Information.ServerName
+                    ? $" [x] {server.Name}"
+                    : $" [ ] {server.Name}", ConsoleColor.Cyan);
+            }
+            Print("", ConsoleColor.Cyan);
+        }
+
     }
 }
+#endregion

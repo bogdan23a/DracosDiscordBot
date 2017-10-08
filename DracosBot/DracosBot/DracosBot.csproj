@@ -133,6 +133,7 @@
   <ItemGroup>
     <Compile Include="9gagCommand.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="Information.cs" />
     <Compile Include="PingCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

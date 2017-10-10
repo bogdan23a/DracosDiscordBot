@@ -12,9 +12,8 @@ namespace DracosBot
     {
         public static int Index;
         public static string[] command = { "!9gaghot", "!9gagtrending", "!9gagfresh" };
-        public static string answer = GetRandIdHot(Index);
         public static string[] GagLink = { "https://9gag.com/hot", "https://9gag.com/trending", "https://9gag.com/fresh" };
-        private static string GetRandIdHot(int Index)
+        private static string Answer(int Index)
         {
             WebClient  GagUrl= new WebClient();
             string GagSource = string.Empty;

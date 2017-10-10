@@ -62,7 +62,7 @@ namespace DracosBot
             _queue = new Queue<Tuple<string, string, string, string>>();
             _tsc = new TaskCompletionSource<bool>();
             _disposeToken = new CancellationTokenSource();
-            _clientThis = _client;
+            //_clientThis = _client;
         }
 
     }

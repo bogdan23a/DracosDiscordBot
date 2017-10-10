@@ -124,12 +124,18 @@ namespace DracosBot
         private async Task MessageReceived(SocketMessage message)
         {
             Print($"User \"{message.Author}\" wrote: \"{message.Content}\"", ConsoleColor.Magenta);
-            Console.WriteLine(Command.PING_COMMAND);
+
             if (message.Content == Command.PING_COMMAND)
                 await message.Channel.SendMessageAsync(Command.PING_ANSWER);
-            else 
-            if(Command.isCommand(Command.ROBERT_COMMAND, message.Content))
+            else
+            if (Command.isCommand(Command.ROBERT_COMMANDS, message.Content))
                 await message.Channel.SendMessageAsync(Command.ROBERT_ANSWER);
+            else
+            if (Command.getIndex(Command.GAG_COMMANDS, message.Content) != -1)
+            {
+                int gagCommand = Command.getIndex(Command.GAG_COMMANDS, message.Content);
+                await message.Channel.SendFileAsync(Command.GAG_ANSWERS(gagCommand)[0]);
+            }
         }
         private Task Log(LogMessage msg)
         {

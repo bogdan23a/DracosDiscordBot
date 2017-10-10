@@ -10,17 +10,16 @@ namespace DracosBot
 {
     class _9gagCommand
     {
-        public static int Index;
-        public static string[] command = { "!9gaghot", "!9gagtrending", "!9gagfresh" };
-        public static string[] GagLink = { "https://9gag.com/hot", "https://9gag.com/trending", "https://9gag.com/fresh" };
-        private static string Answer(int Index)
+        public static string[] commands = { "!9gaghot", "!9gagtrending", "!9gagfresh" };
+        public static string[] gagLink = { "https://9gag.com/hot", "https://9gag.com/trending", "https://9gag.com/fresh" };
+        public static string answer(int Index)
         {
-            WebClient  GagUrl= new WebClient();
-            string GagSource = string.Empty;
-            string GagPostSource = string.Empty;
+            WebClient  gagUrl= new WebClient();
+            string gagSource = string.Empty;
+            string gagPostSource = string.Empty;
             try
             {
-                GagSource = GagUrl.DownloadString(GagLink[Index]);
+                gagSource = gagUrl.DownloadString(gagLink[Index]);
 
             }
             catch(Exception e)
@@ -33,21 +32,21 @@ namespace DracosBot
             int randomGagint = randomGag.Next(1, 10);
             int IsRandomGag = 0;
 
-            foreach(Match match in Regex.Matches(GagSource,ArticleMatch))
+            foreach(Match match in Regex.Matches(gagSource,ArticleMatch))
             {
                 IsRandomGag++;
                 if(IsRandomGag==randomGagint)
                 {
-                    GagPostSource = match.Groups[3].Value;
+                    gagPostSource = match.Groups[3].Value;
                     break;
                 } 
             }
-            string ImgName = GagPostSource.Split('/')[4];
+            string ImgName = gagPostSource.Split('/')[4];
             string ImgPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string ImgPatha = ImgPath.Remove(ImgPath.Length - 13) + ImgName;
-            using (GagUrl)
+            using (gagUrl)
             {
-                GagUrl.DownloadFile(new Uri(GagPostSource),ImgPatha);
+                gagUrl.DownloadFile(new Uri(gagPostSource),ImgPatha);
             }
             return ImgPatha;
         }

@@ -19,6 +19,8 @@ namespace DracosBot
             string[] returnArray = { _9gagCommand.answer(index), "1" };
             return returnArray;
         }
+
+
         public static bool isCommand(string[] commands, string lookupCommand)
         {
             return commands.Contains(lookupCommand);

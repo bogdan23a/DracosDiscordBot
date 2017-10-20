@@ -10,11 +10,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using 
 namespace DracosBot
 {  
 
     class Program  
     {
+        private readonly AudioPlayerManager playerManager;
         private IVoiceChannel _voiceChannel;
         private ITextChannel _textChannel;
         private IAudioClient _audio;

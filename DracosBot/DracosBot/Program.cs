@@ -29,7 +29,7 @@ namespace DracosBot
         /// </summary>
         private Queue<Tuple<string, string, string, string>> _queue;
 
-       /* private bool Pause
+        private bool Pause
         {
             get => _internal_Pause;
             set
@@ -37,7 +37,9 @@ namespace DracosBot
                 new Thread(() => _tsc.TrySetResult(value)).Start();
                 _internal_Pause = value;
             }
-        }*/
+        }
+
+
         private bool _internal_Pause;
         private bool Skip
         {
@@ -614,6 +616,169 @@ namespace DracosBot
 
             string msg = _permittedUsers.Aggregate("Permitted Users:\n\r    ", (current, user) => current + (user + ", "));
             Print(msg, ConsoleColor.Cyan);
+        }
+
+        public void InitThread()
+        {
+            //TODO: Main Thread or New Thread?
+            //MusicPlay();
+            new Thread(MusicPlay).Start();
+        }
+
+        //Looped Music Play
+        private async void MusicPlay()
+        {
+            bool next = false;
+
+            while (true)
+            {
+                bool pause = false;
+                //Next song if current is over
+                if (!next)
+                {
+                    pause = await _tcs.Task;
+                    _tcs = new TaskCompletionSource<bool>();
+                }
+                else
+                {
+                    next = false;
+                }
+
+                try
+                {
+                    if (_queue.Count == 0)
+                    {
+                        await _client.SetGameAsync("Nothing :/");
+                        Print("Playlist ended.", ConsoleColor.Magenta);
+                    }
+                    else
+                    {
+                        if (!pause)
+                        {
+                            //Get Song
+                            var song = _queue.Peek();
+                            //Update "Playing .."
+                            await _client.SetGameAsync(song.Item2, song.Item1);
+                            Print($"Now playing: {song.Item2} ({song.Item3})", ConsoleColor.Magenta);
+                            await SendMessage($"Now playing: **{song.Item2}** ({song.Item3})");
+
+                            //Send audio (Long Async blocking, Read/Write stream)
+                            await SendAudio(song.Item1);
+
+                            try
+                            {
+                                File.Delete(song.Item1);
+                            }
+                            catch
+                            {
+                                // ignored
+                            }
+                            finally
+                            {
+                                //Finally remove song from playlist
+                                _queue.Dequeue();
+                            }
+                            next = true;
+                        }
+                    }
+                }
+                catch
+                {
+                    //audio can't be played
+                }
+            }
+        }
+
+        //Get ffmpeg Audio Procecss
+        private static Process GetFfmpeg(string path)
+        {
+            ProcessStartInfo ffmpeg = new ProcessStartInfo
+            {
+                FileName = "ffmpeg",
+                Arguments = $"-xerror -i \"{path}\" -ac 2 -f s16le -ar 48000 pipe:1",
+                //UseShellExecute = false,    //TODO: true or false?
+                RedirectStandardOutput = true
+            };
+            return Process.Start(ffmpeg);
+        }
+
+        //Get ffplay Audio Procecss
+        private static Process GetFfplay(string path)
+        {
+            ProcessStartInfo ffplay = new ProcessStartInfo
+            {
+                FileName = "ffplay",
+                Arguments = $"-i \"{path}\" -ac 2 -f s16le -ar 48000 pipe:1 -autoexit",
+                //UseShellExecute = false,    //TODO: true or false?
+                RedirectStandardOutput = true
+            };
+
+            return new Process { StartInfo = ffplay };
+        }
+
+        //Send Audio with ffmpeg
+        private async Task SendAudio(string path)
+        {
+            //FFmpeg.exe
+            Process ffmpeg = GetFfmpeg(path);
+            //Read FFmpeg output
+            using (Stream output = ffmpeg.StandardOutput.BaseStream)
+            {
+                using (AudioOutStream discord = _audio.CreatePCMStream(AudioApplication.Mixed, 1920))
+                {
+
+                    //Adjust?
+                    int bufferSize = 1024;
+                    int bytesSent = 0;
+                    bool fail = false;
+                    bool exit = false;
+                    byte[] buffer = new byte[bufferSize];
+
+                    while (
+                        !Skip &&                                    // If Skip is set to true, stop sending and set back to false (with getter)
+                        !fail &&                                    // After a failed attempt, stop sending
+                        !_disposeToken.IsCancellationRequested &&   // On Cancel/Dispose requested, stop sending
+                        !exit                                       // Audio Playback has ended (No more data from FFmpeg.exe)
+                            )
+                    {
+                        try
+                        {
+                            int read = await output.ReadAsync(buffer, 0, bufferSize, _disposeToken.Token);
+                            if (read == 0)
+                            {
+                                //No more data available
+                                exit = true;
+                                break;
+                            }
+
+                            await discord.WriteAsync(buffer, 0, read, _disposeToken.Token);
+
+                            if (Pause)
+                            {
+                                bool pauseAgain;
+
+                                do
+                                {
+                                    pauseAgain = await _tcs.Task;
+                                    _tcs = new TaskCompletionSource<bool>();
+                                } while (pauseAgain);
+                            }
+
+                            bytesSent += read;
+                        }
+                        catch (TaskCanceledException)
+                        {
+                            exit = true;
+                        }
+                        catch
+                        {
+                            fail = true;
+                            // could not send
+                        }
+                    }
+                    await discord.FlushAsync();
+                }
+            }
         }
 
     }

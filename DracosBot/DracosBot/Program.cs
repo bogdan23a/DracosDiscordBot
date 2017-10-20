@@ -35,7 +35,11 @@ namespace DracosBot
             set
             {
                 //fucking trySetResult ?!?!?
-                new Thread(() => _tsc.TrySetResult(value)).Start();
+                //LET'S UNDESTAND THREADS AND TRYSETRESULT
+                //maybe use lava player instead of this shit
+                
+                //
+                new Thread(() => _tsc
                 _internal_Pause = value;
             }
         }

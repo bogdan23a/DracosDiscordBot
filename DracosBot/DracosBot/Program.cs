@@ -34,6 +34,7 @@ namespace DracosBot
             get => _internal_Pause;
             set
             {
+                //fucking trySetResult ?!?!?
                 new Thread(() => _tsc.TrySetResult(value)).Start();
                 _internal_Pause = value;
             }
@@ -56,7 +57,7 @@ namespace DracosBot
 
         private bool _internal_Skip;
 
-        public bool isDisposed;
+        public bool IsDisposed;
 
         //9GagSubBot 9gagBot;
         static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
@@ -780,6 +781,48 @@ namespace DracosBot
                 }
             }
         }
+        //Dispose this Object (Async)
+        private async Task DisposeAsync()
+        {
+            try
+            {
+                await _client.StopAsync();
+                await _client.LogoutAsync();
+            }
+            catch
+            {
+                // could not disconnect
+            }
+            _client?.Dispose();
+        }
+
+        //Dispose this Object
+        public void Dispose()
+        {
+            IsDisposed = true;
+            _disposeToken.Cancel();
+
+            Print("Shutting down...", ConsoleColor.Red);
+
+            //Run File Delete on new Thread
+            new Thread(() =>
+            {
+                foreach (var song in _queue)
+                {
+                    try
+                    {
+                        File.Delete(song.Item1);
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+                }
+            }).Start();
+
+            DisposeAsync().GetAwaiter().GetResult();
+        }
+    
 
     }
 }

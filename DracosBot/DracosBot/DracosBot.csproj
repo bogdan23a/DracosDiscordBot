@@ -250,6 +250,8 @@
     <Compile Include="lavaplayer\remote\RemoteNodeRegistry.cs" />
     <Compile Include="lavaplayer\source\AudioSourceManager.cs" />
     <Compile Include="lavaplayer\tools\FriendlyException.cs" />
+    <Compile Include="lavaplayer\tools\io\HttpConfigurable.cs" />
+    <Compile Include="lavaplayer\tools\io\HttpInterfaceManager.cs" />
     <Compile Include="lavaplayer\track\AudioItem.cs" />
     <Compile Include="lavaplayer\track\AudioPlaylist.cs" />
     <Compile Include="lavaplayer\track\AudioReference.cs" />
@@ -275,6 +277,8 @@
     <Content Include="AudioPlayerManager.java" />
     <Content Include="AudioSourceManagers.java" />
     <Content Include="DefaultAudioPlayerManager.java" />
+    <Content Include="HttpConfigurable.java" />
+    <Content Include="HttpInterfaceManager.java" />
     <Content Include="RemoteNode.java" />
     <Content Include="RemoteNodeManager.java" />
     <Content Include="RemoteNodeProcessor.java" />

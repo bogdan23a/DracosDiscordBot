@@ -222,9 +222,44 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="9gagCommand.cs" />
+    <Compile Include="lavaplayer\format\AudioDataFormat.cs" />
+    <Compile Include="lavaplayer\format\StandardAudioDataFormats.cs" />
+    <Compile Include="lavaplayer\player\AudioConfiguration.cs" />
+    <Compile Include="lavaplayer\player\AudioLoadResultHandler.cs" />
+    <Compile Include="lavaplayer\player\AudioPlayer.cs" />
+    <Compile Include="lavaplayer\player\AudioPlayerManager.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="DownloadHelper.cs" />
     <Compile Include="Information.cs" />
+    <Compile Include="lavaplayer\player\DefaultAudioPlayerManager.cs" />
+    <Compile Include="lavaplayer\player\event\AudioEvent.cs" />
+    <Compile Include="lavaplayer\player\event\AudioEventAdapter.cs" />
+    <Compile Include="lavaplayer\player\event\AudioEventListener.cs" />
+    <Compile Include="lavaplayer\player\event\PlayerPauseEvent.cs" />
+    <Compile Include="lavaplayer\player\event\PlayerResumeEvent.cs" />
+    <Compile Include="lavaplayer\player\event\TrackEndEvent.cs" />
+    <Compile Include="lavaplayer\player\event\TrackExceptionEvent.cs" />
+    <Compile Include="lavaplayer\player\event\TrackStartEvent.cs" />
+    <Compile Include="lavaplayer\player\event\TrackStuckEvent.cs" />
+    <Compile Include="lavaplayer\player\hook\AudioOutputHook.cs" />
+    <Compile Include="lavaplayer\player\hook\AudioOutputHookFactory.cs" />
+    <Compile Include="lavaplayer\remote\message\NodeStatisticsMessage.cs" />
+    <Compile Include="lavaplayer\remote\message\RemoteMessage.cs" />
+    <Compile Include="lavaplayer\remote\RemoteNode.cs" />
+    <Compile Include="lavaplayer\remote\RemoteNodeManager.cs" />
+    <Compile Include="lavaplayer\remote\RemoteNodeRegistry.cs" />
+    <Compile Include="lavaplayer\source\AudioSourceManager.cs" />
+    <Compile Include="lavaplayer\tools\FriendlyException.cs" />
+    <Compile Include="lavaplayer\track\AudioItem.cs" />
+    <Compile Include="lavaplayer\track\AudioPlaylist.cs" />
+    <Compile Include="lavaplayer\track\AudioReference.cs" />
+    <Compile Include="lavaplayer\track\AudioTrack.cs" />
+    <Compile Include="lavaplayer\track\AudioTrackEndReason.cs" />
+    <Compile Include="lavaplayer\track\AudioTrackInfo.cs" />
+    <Compile Include="lavaplayer\track\AudioTrackState.cs" />
+    <Compile Include="lavaplayer\track\DecodedTrackHolder.cs" />
+    <Compile Include="lavaplayer\track\TrackMarker.cs" />
+    <Compile Include="lavaplayer\track\TrackMarkerHandler.cs" />
     <Compile Include="PingCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -236,13 +271,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AudioLoadResultHandler.java" />
+    <Content Include="AudioPlayer.java" />
     <Content Include="AudioPlayerManager.java" />
-    <Content Include="AudioPlaylist.java" />
     <Content Include="AudioSourceManagers.java" />
-    <Content Include="AudioTrack.java" />
     <Content Include="DefaultAudioPlayerManager.java" />
-    <Content Include="FriendlyException.java" />
+    <Content Include="RemoteNode.java" />
+    <Content Include="RemoteNodeManager.java" />
+    <Content Include="RemoteNodeProcessor.java" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

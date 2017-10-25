@@ -13,7 +13,6 @@ namespace com.sedmelluq.discord.lavaplayer.track
     {
         /// <param name="state"> The state of the marker when it is triggered. </param>
         void handle(TrackMarkerHandler_MarkerState state);
-
         /// <summary>
         /// The state of the marker at the moment the handle method is called.
         /// </summary>

@@ -3,41 +3,42 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Useful.LoggerFactory;
 using Microsoft.Extensions.Logging;
+using System.Threading;
+using java.util.concurrent.atomic;
+using java.lang;
+using java.io;
+using java.util.concurrent;
+
 namespace com.sedmelluq.discord.lavaplayer.track.playback
 {
     using AudioDataFormat = com.sedmelluq.discord.lavaplayer.format.AudioDataFormat;
     using AudioConfiguration = com.sedmelluq.discord.lavaplayer.player.AudioConfiguration;
     using ExceptionTools = com.sedmelluq.discord.lavaplayer.tools.ExceptionTools;
     using FriendlyException = com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+    using Severity = tools.FriendlyException.Severity;
     //using Logger = org.slf4j.Logger;
     //using LoggerFactory = org.slf4j.LoggerFactory;
-
-
-    //JAVA TO C# CONVERTER TODO TASK: This Java 'import static' statement cannot be converted to C#:
-    using findDeepExceptuon = tools.ExceptionTools.findDeepException;
-    //JAVA TO C# CONVERTER TODO TASK: This Java 'import static' statement cannot be converted to C#:
-    using FAULT = com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.FAULT;
-    //JAVA TO C# CONVERTER TODO TASK: This Java 'import static' statement cannot be converted to C#:
-    using SUSPICIOUS = com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS;
-    //JAVA TO C# CONVERTER TODO TASK: This Java 'import static' statement cannot be converted to C#:
-    using ENDED = com.sedmelluq.discord.lavaplayer.track.TrackMarkerHandler_MarkerState.ENDED;
-    //JAVA TO C# CONVERTER TODO TASK: This Java 'import static' statement cannot be converted to C#:
-    using STOPPED = com.sedmelluq.discord.lavaplayer.track.TrackMarkerHandler_MarkerState.STOPPED;
 
     /// <summary>
     /// Handles the execution and output buffering of an audio track.
     /// </summary>
     public class LocalAudioTrackExecutor : AudioTrackExecutor
     {
-        private static readonly ILoggerFactory loggerFactory = new ILoggerFactory()
-        private static readonly ILogger log = ILoggerFactory.(typeof(LocalAudioTrackExecutor));
+        Severity FAULT = Severity.FAULT;
+        Severity SUSPICIOUS = Severity.SUSPICIOUS;
+        TrackMarkerHandler_MarkerState ENDED = TrackMarkerHandler_MarkerState.ENDED;
+        TrackMarkerHandler_MarkerState STOPPED = TrackMarkerHandler_MarkerState.STOPPED;
+        private static readonly ILoggerFactory loggerFactory;
+
+        private static readonly ILogger log = loggerFactory.CreateLogger(typeof(LocalAudioTrackExecutor));
 
         private readonly InternalAudioTrack audioTrack;
         private readonly AudioProcessingContext processingContext;
         private readonly bool useSeekGhosting;
         private readonly AudioFrameBuffer frameBuffer;
-        private readonly AtomicReference<Thread> playingThread = new AtomicReference<Thread>();
+        private readonly AtomicReference<System.Threading.Thread> playingThread = new AtomicReference<System.Threading.Thread>();
         private readonly AtomicBoolean isStopping = new AtomicBoolean(false);
         private readonly AtomicLong pendingSeek = new AtomicLong(-1);
         private readonly AtomicLong lastFrameTimecode = new AtomicLong(0);
@@ -45,7 +46,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
         private readonly object actionSynchronizer = new object();
         private readonly TrackMarkerTracker markerTracker = new TrackMarkerTracker();
         private bool interruptibleForSeek = false;
-        private volatile Exception trackException;
+        private volatile System.Exception trackException;
 
         /// <param name="audioTrack"> The audio track that this executor executes </param>
         /// <param name="configuration"> Configuration to use for audio processing </param>
@@ -71,7 +72,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
             }
         }
 
-        public override AudioFrameBuffer AudioBuffer
+        public AudioFrameBuffer AudioBuffer
         {
             get
             {
@@ -80,18 +81,18 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
         }
 
 
-        public override void execute(TrackStateListener listener)
+        public void execute(TrackStateListener listener)
         {
             InterruptedException interrupt = null;
 
-            if (Thread.interrupted())
+            if (java.lang.Thread.interrupted())
             {
-                log.debug("Cleared a stray interrupt.");
+                log.LogDebug("Cleared a stray interrupt.");
             }
 
-            if (playingThread.compareAndSet(null, Thread.CurrentThread))
+            if (playingThread.compareAndSet(null, System.Threading.Thread.CurrentThread))
             {
-                log.debug("Starting to play track {} locally with listener {}", audioTrack.Info.identifier, listener);
+                log.LogDebug("Starting to play track {} locally with listener {}", audioTrack.Info.identifier, listener);
 
                 state.set(AudioTrackState.LOADING);
 
@@ -99,16 +100,16 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
                 {
                     audioTrack.process(this);
 
-                    log.debug("Playing track {} finished or was stopped.", audioTrack.Identifier);
+                    log.LogDebug("Playing track {} finished or was stopped.", audioTrack.Identifier);
                 }
-                catch (Exception e)
+                catch (System.Exception e)
                 {
                     // Temporarily clear the interrupted status so it would not disrupt listener methods.
                     interrupt = findInterrupt(e);
 
                     if (interrupt != null && checkStopped())
                     {
-                        log.debug("Track {} was interrupted outside of execution loop.", audioTrack.Identifier);
+                        log.LogDebug("Track {} was interrupted outside of execution loop.", audioTrack.Identifier);
                     }
                     else
                     {
@@ -129,7 +130,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
                     {
                         interrupt = interrupt != null ? interrupt : findInterrupt(null);
 
-                        playingThread.compareAndSet(Thread.CurrentThread, null);
+                        playingThread.compareAndSet(System.Threading.Thread.CurrentThread, null);
 
                         markerTracker.trigger(ENDED);
                         state.set(AudioTrackState.FINISHED);
@@ -137,32 +138,32 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
 
                     if (interrupt != null)
                     {
-                        Thread.CurrentThread.Interrupt();
+                        System.Threading.Thread.CurrentThread.Interrupt();
                     }
                 }
             }
             else
             {
-                log.warn("Tried to start an already playing track {}", audioTrack.Identifier);
+                log.LogWarning("Tried to start an already playing track {}", audioTrack.Identifier);
             }
         }
 
-        public override void stop()
+        public void stop()
         {
             lock (actionSynchronizer)
             {
-                Thread thread = playingThread.get();
+                System.Threading.Thread thread = playingThread.get();
 
                 if (thread != null)
                 {
-                    log.debug("Requesting stop for track {}", audioTrack.Identifier);
+                    log.LogDebug("Requesting stop for track {}", audioTrack.Identifier);
 
                     isStopping.compareAndSet(false, true);
                     thread.Interrupt();
                 }
                 else
                 {
-                    log.debug("Tried to stop track {} which is not playing.", audioTrack.Identifier);
+                    log.LogDebug("Tried to stop track {} which is not playing.", audioTrack.Identifier);
                 }
             }
         }
@@ -193,7 +194,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
         {
             lock (actionSynchronizer)
             {
-                Thread thread = playingThread.get();
+                System.Threading.Thread thread = playingThread.get();
 
                 if (thread != null)
                 {
@@ -205,7 +206,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
             }
         }
 
-        public override long Position
+        public long Position
         {
             get
             {
@@ -239,7 +240,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
         }
 
 
-        public override AudioTrackState State
+        public AudioTrackState State
         {
             get
             {
@@ -247,7 +248,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
             }
         }
 
-    /// <returns> True if this track is currently in the middle of a seek. </returns>
+        /// <returns> True if this track is currently in the middle of a seek. </returns>
         private bool PerformingSeek
         {
             get
@@ -256,7 +257,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
             }
         }
 
-        public override TrackMarker Marker
+        public TrackMarker Marker
         {
             set
             {
@@ -264,7 +265,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
             }
         }
 
-        public override bool failedBeforeLoad()
+        public bool failedBeforeLoad()
         {
             return trackException != null && !frameBuffer.hasReceivedFrames();
         }
@@ -287,7 +288,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
                 try
                 {
                     // An interrupt may have been placed while we were handling the previous one.
-                    if (Thread.interrupted() && !handlePlaybackInterrupt(null, seekExecutor))
+                    if (java.lang.Thread.interrupted() && !handlePlaybackInterrupt(null, seekExecutor))
                     {
                         break;
                     }
@@ -299,7 +300,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
                     // Must not finish before terminator frame has been consumed the user may still want to perform seeks until then
                     waitOnEnd();
                 }
-                catch (Exception e)
+                catch (System.Exception e)
                 {
                     InterruptibleForSeek = false;
                     InterruptedException interruption = findInterrupt(e);
@@ -315,7 +316,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
                 }
             }
         }
-    
+
 
         private bool InterruptibleForSeek
         {
@@ -337,7 +338,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
                 if (interruptibleForSeek)
                 {
                     interruptibleForSeek = false;
-                    Thread thread = playingThread.get();
+                    System.Threading.Thread thread = playingThread.get();
 
                     if (thread != null)
                     {
@@ -349,17 +350,17 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
 
             if (interrupted)
             {
-                log.debug("Interrupting playing thread to perform a seek {}", audioTrack.Identifier);
+                log.LogDebug("Interrupting playing thread to perform a seek {}", audioTrack.Identifier);
             }
             else
             {
-                log.debug("Seeking on track {} while not in playback loop.", audioTrack.Identifier);
+                log.LogDebug("Seeking on track {} while not in playback loop.", audioTrack.Identifier);
             }
         }
 
         private bool handlePlaybackInterrupt(InterruptedException interruption, SeekExecutor seekExecutor)
         {
-            Thread.interrupted();
+            java.lang.Thread.interrupted();
 
             if (checkStopped())
             {
@@ -381,7 +382,7 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
             }
             else if (interruption != null)
             {
-                Thread.CurrentThread.Interrupt();
+                System.Threading.Thread.CurrentThread.Interrupt();
                 throw new FriendlyException("The track was unexpectedly terminated.", SUSPICIOUS, interruption);
             }
             else
@@ -390,65 +391,65 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
             }
         }
 
-    private InterruptedException findInterrupt(Exception throwable)
-    {
-        InterruptedException exception = findDeepException(throwable, typeof(InterruptedException));
-
-        if (exception == null)
+        private InterruptedException findInterrupt(System.Exception throwable)
         {
-            InterruptedIOException ioException = findDeepException(throwable, typeof(InterruptedIOException));
+            InterruptedException exception = ExceptionTools.findDeepException<InterruptedException>(throwable, typeof(InterruptedException));
 
-            if (ioException != null && (ioException.Message == null || !ioException.Message.contains("timed out")))
+            if (exception == null)
             {
-                exception = new InterruptedException(ioException.Message);
+                InterruptedIOException ioException = ExceptionTools.findDeepException<InterruptedIOException>(throwable, typeof(InterruptedIOException));
+
+                if (ioException != null && (ioException.Message == null || !ioException.Message.Contains("timed out")))
+                {
+                    exception = new InterruptedException(ioException.Message);
+                }
             }
+
+            if (exception == null && java.lang.Thread.interrupted())
+            {
+                return new InterruptedException();
+            }
+
+            return exception;
         }
 
-        if (exception == null && Thread.interrupted())
+        /// <summary>
+        /// Performs a seek if it scheduled. </summary>
+        /// <param name="seekExecutor"> Callback for performing a seek on the track </param>
+        /// <returns> True if a seek was performed </returns>
+        private bool checkPendingSeek(SeekExecutor seekExecutor)
         {
-            return new InterruptedException();
-        }
-
-        return exception;
-    }
-
-    /// <summary>
-    /// Performs a seek if it scheduled. </summary>
-    /// <param name="seekExecutor"> Callback for performing a seek on the track </param>
-    /// <returns> True if a seek was performed </returns>
-    private bool checkPendingSeek(SeekExecutor seekExecutor)
-    {
-        if (!audioTrack.Seekable)
-        {
-            return false;
-        }
-
-        long seekPosition;
-
-        lock (actionSynchronizer)
-        {
-            seekPosition = pendingSeek.get();
-
-            if (seekPosition == -1)
+            if (!audioTrack.Seekable)
             {
                 return false;
             }
 
-            log.debug("Track {} interrupted for seeking to {}.", audioTrack.Identifier, seekPosition);
-            applySeekState(seekPosition);
-        }
+            long seekPosition;
 
-        try
-        {
-            seekExecutor.performSeek(seekPosition);
-        }
-        catch (Exception e)
-        {
-            throw ExceptionTools.wrapUnfriendlyExceptions("Something went wrong when seeking to a position.", FAULT, e);
-        }
+            lock (actionSynchronizer)
+            {
+                seekPosition = pendingSeek.get();
 
-        return true;
-    }
+                if (seekPosition == -1)
+                {
+                    return false;
+                }
+
+                log.LogDebug("Track {} interrupted for seeking to {}.", audioTrack.Identifier, seekPosition);
+                applySeekState(seekPosition);
+            }
+
+            try
+            {
+                seekExecutor.performSeek(seekPosition);
+            }
+            catch (System.Exception e)
+            {
+                throw ExceptionTools.wrapUnfriendlyExceptions("Something went wrong when seeking to a position.", FAULT, e);
+            }
+
+            return true;
+        }
         private void applySeekState(long seekPosition)
         {
             state.set(AudioTrackState.SEEKING);
@@ -466,55 +467,57 @@ namespace com.sedmelluq.discord.lavaplayer.track.playback
             markerTracker.checkSeekTimecode(seekPosition);
         }
 
-        @Override
-  public AudioFrame provide()
+        public AudioFrame provide()
         {
             AudioFrame frame = frameBuffer.provide();
             processProvidedFrame(frame);
             return frame;
         }
 
-        @Override
-  public AudioFrame provide(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException {
-    AudioFrame frame = frameBuffer.provide(timeout, unit);
-    processProvidedFrame(frame);
-    return frame;
-  }
-
-    private void processProvidedFrame(AudioFrame frame)
-    {
-        if (frame != null && !frame.isTerminator())
+        //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
+        //ORIGINAL LINE: @Override public AudioFrame provide(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException
+        public AudioFrame provide(long timeout, TimeUnit unit)
         {
-            if (!isPerformingSeek())
-            {
-                markerTracker.checkPlaybackTimecode(frame.timecode);
-            }
-
-            lastFrameTimecode.set(frame.timecode);
+            AudioFrame frame = frameBuffer.provide(timeout, unit);
+            processProvidedFrame(frame);
+            return frame;
         }
-    }
 
-    /**
-     * Read executor, see method description
-     */
-    public interface ReadExecutor
-    {
-        /**
-         * Reads until interrupted or EOF
-         * @throws InterruptedException
-         */
-        void performRead() throws InterruptedException;
-    }
+        private void processProvidedFrame(AudioFrame frame)
+        {
+            if (frame != null && !frame.Terminator)
+            {
+                if (!PerformingSeek)
+                {
+                    markerTracker.checkPlaybackTimecode(frame.timecode);
+                }
 
-    /**
-     * Seek executor, see method description
-     */
-    public interface SeekExecutor
-    {
-        /**
-         * Perform a seek to the specified position
-         * @param position Position in milliseconds
-         */
-        void performSeek(long position);
+                lastFrameTimecode.set(frame.timecode);
+            }
+        }
+
+        /// <summary>
+        /// Read executor, see method description
+        /// </summary>
+        public interface ReadExecutor
+        {
+            /// <summary>
+            /// Reads until interrupted or EOF </summary>
+            /// <exception cref="InterruptedException"> </exception>
+            //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
+            //ORIGINAL LINE: void performRead() throws InterruptedException;
+            void performRead();
+        }
+
+        /// <summary>
+        /// Seek executor, see method description
+        /// </summary>
+        public interface SeekExecutor
+        {
+            /// <summary>
+            /// Perform a seek to the specified position </summary>
+            /// <param name="position"> Position in milliseconds </param>
+            void performSeek(long position);
+        }
     }
 }

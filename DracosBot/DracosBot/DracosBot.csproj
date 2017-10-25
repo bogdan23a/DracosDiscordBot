@@ -277,10 +277,12 @@
     <Compile Include="lavaplayer\track\playback\AudioFrameConsumer.cs" />
     <Compile Include="lavaplayer\track\playback\AudioFrameProvider.cs" />
     <Compile Include="lavaplayer\track\playback\AudioFrameRebuilder.cs" />
+    <Compile Include="lavaplayer\track\playback\AudioProcessingContext.cs" />
     <Compile Include="lavaplayer\track\playback\AudioTrackExecutor.cs" />
     <Compile Include="lavaplayer\track\playback\LocalAudioTrackExecutor.cs" />
     <Compile Include="lavaplayer\track\TrackMarker.cs" />
     <Compile Include="lavaplayer\track\TrackMarkerHandler.cs" />
+    <Compile Include="lavaplayer\track\TrackMarkerTracker.cs" />
     <Compile Include="lavaplayer\track\TrackStateListener.cs" />
     <Compile Include="PingCommand.cs" />
     <Compile Include="Program.cs" />
@@ -305,6 +307,7 @@
     <Content Include="RemoteNode.java" />
     <Content Include="RemoteNodeManager.java" />
     <Content Include="RemoteNodeProcessor.java" />
+    <Content Include="TrackMarkerTracker.java" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

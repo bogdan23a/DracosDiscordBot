@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace com.sedmelluq.discord.lavaplayer.tools
 {
     using Severity = com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity;
-    //using Logger = org.slf4j.Logger;
+    using Logger = Microsoft.Extensions.Logging;
 
 
     /// <summary>
@@ -97,26 +97,28 @@ namespace com.sedmelluq.discord.lavaplayer.tools
         /// <param name="klass"> The throwable class to scan for. </param>
         /// @param <T> The throwable class to scan for. </param>
         /// <returns> The first exception in the cause chain (including itself) which is an instance of the specified class. </returns>
-        public static System.Type findDeepException<T>(System.Exception throwable, System.Type klass) where T : System.Exception
+
+
+        public static T findDeepException<T>(System.Exception throwable, Type klass) where T : System.Exception
         {
             while (throwable != null)
             {
-               
                 if (IsAssignableToGenericType(klass, throwable.GetType()))
                 {
-                    return throwable.GetType();
+                    return (T)throwable;
                 }
 
                 throwable = throwable.InnerException;
             }
 
-            return default(System.Type);
+            return default(T);
         }
 
-        /// <summary>
-        /// Makes sure thread is set to interrupted state when the throwable is an InterruptedException </summary>
-        /// <param name="throwable"> Throwable to check </param>
-        public static void keepInterrupted(System.Exception throwable)
+
+    /// <summary>
+    /// Makes sure thread is set to interrupted state when the throwable is an InterruptedException </summary>
+    /// <param name="throwable"> Throwable to check </param>
+    public static void keepInterrupted(System.Exception throwable)
         {
             if (throwable is InterruptedException)
             {
@@ -130,6 +132,22 @@ namespace com.sedmelluq.discord.lavaplayer.tools
         /// <param name="exception"> The exception itself </param>
         /// <param name="context"> An object that is included in the log </param>
 
+        public static void log(Microsoft.Extensions.Logging.ILogger log, FriendlyException exception, object context)
+        {
+            switch (exception.severity)
+            {
+                case Severity.COMMON:
+                    log.LogDebug("Common failure for {}: {}", context, exception.Message);
+                    break;
+                case Severity.SUSPICIOUS:
+                    log.LogWarning("Suspicious exception for {}", context, exception);
+                    break;
+                case Severity.FAULT:
+                default:
+                    log.LogError("Error in {}", context, exception);
+                    break;
+            }
+        }
 
         /// <summary>
         /// Encode an exception to an output stream </summary>
@@ -181,15 +199,15 @@ namespace com.sedmelluq.discord.lavaplayer.tools
             output.writeUTF(exception.Message);
             output.writeInt((int)exception.severity);
 
-            decodeStackTrace(output, exception);
-            encodeException
+           
+            encodeStackTrace(output, exception);
         }
 
         //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
         //ORIGINAL LINE: private static void encodeStackTrace(DataOutput output, Throwable throwable) throws IOException
-        /*private static void encodeStackTrace(DataOutput output, System.Exception throwable)
+        private static void encodeStackTrace(DataOutput output, System.Exception throwable)
         {
-            StackTrace[] trace = throwable.StackTrace;
+            StackTraceElement[] trace = throwable.;
             output.writeInt(trace.Length);
 
             foreach (StackTrace element in trace)
@@ -205,7 +223,7 @@ namespace com.sedmelluq.discord.lavaplayer.tools
                 }
                 output.writeInt(element.getLineNumber());
             }
-        }*/
+        }
 
         /// <summary>
         /// Decode an exception from an input stream </summary>

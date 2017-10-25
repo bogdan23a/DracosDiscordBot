@@ -46,7 +46,7 @@ namespace com.sedmelluq.discord.lavaplayer.tools
             /// This is the default level and other levels are used in cases where the thrower has more in-depth knowledge
             /// about the error.
             /// </summary>
-            FAULT
+             FAULT
         }
     }
 }

@@ -134,6 +134,9 @@
     <Reference Include="IKVM.Runtime.JNI, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
       <HintPath>..\packages\IKVM.8.1.5717.0\lib\IKVM.Runtime.JNI.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="ManagedBass, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedBass.1.0.0\lib\net45\ManagedBass.dll</HintPath>
     </Reference>
@@ -145,6 +148,9 @@
     </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.1.1\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.1.0.0\lib\netstandard1.1\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
@@ -219,6 +225,9 @@
     <Reference Include="System.Xml.ReaderWriter, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Xml.ReaderWriter.4.3.0\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
     </Reference>
+    <Reference Include="Useful.LoggerFactory.Log4net, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Useful.LoggerFactory.Log4net.1.0.1\lib\net46\Useful.LoggerFactory.Log4net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="9gagCommand.cs" />
@@ -249,6 +258,8 @@
     <Compile Include="lavaplayer\remote\RemoteNodeManager.cs" />
     <Compile Include="lavaplayer\remote\RemoteNodeRegistry.cs" />
     <Compile Include="lavaplayer\source\AudioSourceManager.cs" />
+    <Compile Include="lavaplayer\tools\DecodedException.cs" />
+    <Compile Include="lavaplayer\tools\ExceptionTools.cs" />
     <Compile Include="lavaplayer\tools\FriendlyException.cs" />
     <Compile Include="lavaplayer\tools\io\HttpConfigurable.cs" />
     <Compile Include="lavaplayer\tools\io\HttpInterfaceManager.cs" />
@@ -260,8 +271,17 @@
     <Compile Include="lavaplayer\track\AudioTrackInfo.cs" />
     <Compile Include="lavaplayer\track\AudioTrackState.cs" />
     <Compile Include="lavaplayer\track\DecodedTrackHolder.cs" />
+    <Compile Include="lavaplayer\track\InternalAudioTrack.cs" />
+    <Compile Include="lavaplayer\track\playback\AudioFrame.cs" />
+    <Compile Include="lavaplayer\track\playback\AudioFrameBuffer.cs" />
+    <Compile Include="lavaplayer\track\playback\AudioFrameConsumer.cs" />
+    <Compile Include="lavaplayer\track\playback\AudioFrameProvider.cs" />
+    <Compile Include="lavaplayer\track\playback\AudioFrameRebuilder.cs" />
+    <Compile Include="lavaplayer\track\playback\AudioTrackExecutor.cs" />
+    <Compile Include="lavaplayer\track\playback\LocalAudioTrackExecutor.cs" />
     <Compile Include="lavaplayer\track\TrackMarker.cs" />
     <Compile Include="lavaplayer\track\TrackMarkerHandler.cs" />
+    <Compile Include="lavaplayer\track\TrackStateListener.cs" />
     <Compile Include="PingCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -277,8 +297,11 @@
     <Content Include="AudioPlayerManager.java" />
     <Content Include="AudioSourceManagers.java" />
     <Content Include="DefaultAudioPlayerManager.java" />
+    <Content Include="ExceptionTools.java" />
     <Content Include="HttpConfigurable.java" />
     <Content Include="HttpInterfaceManager.java" />
+    <Content Include="InternalAudioTrack.java" />
+    <Content Include="LocalAudioTrackExecutor.java" />
     <Content Include="RemoteNode.java" />
     <Content Include="RemoteNodeManager.java" />
     <Content Include="RemoteNodeProcessor.java" />

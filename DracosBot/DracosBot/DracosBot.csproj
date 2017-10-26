@@ -32,6 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging, Version=3.0.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.3.0.0\lib\net40\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Core, Version=3.0.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.Core.3.0.0\lib\net40\Common.Logging.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Discord.Net.Commands, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Discord.Net.Commands.1.0.2\lib\netstandard1.1\Discord.Net.Commands.dll</HintPath>
     </Reference>
@@ -157,6 +163,9 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Core, Version=2.0.1.45000, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
+      <HintPath>..\packages\Spring.Core.2.0.1\lib\net45\Spring.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -973,18 +982,41 @@
     <Compile Include="lavaplayer\player\event\TrackStuckEvent.cs" />
     <Compile Include="lavaplayer\player\hook\AudioOutputHook.cs" />
     <Compile Include="lavaplayer\player\hook\AudioOutputHookFactory.cs" />
+    <Compile Include="lavaplayer\remote\AbandonedTrackManager.cs" />
+    <Compile Include="lavaplayer\remote\message\NodeStatisticsCodec.cs" />
     <Compile Include="lavaplayer\remote\message\NodeStatisticsMessage.cs" />
     <Compile Include="lavaplayer\remote\message\RemoteMessage.cs" />
+    <Compile Include="lavaplayer\remote\message\RemoteMessageCodec.cs" />
+    <Compile Include="lavaplayer\remote\message\RemoteMessageMapper.cs" />
+    <Compile Include="lavaplayer\remote\message\RemoteMessageType.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackExceptionCodec.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackExceptionMessage.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackFrameDataCodec.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackFrameDataMessage.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackFrameRequestCodec.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackFrameRequestMessage.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackStartRequestCodec.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackStartRequestMessage.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackStartResponseCodec.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackStartResponseMessage.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackStoppedCodec.cs" />
+    <Compile Include="lavaplayer\remote\message\TrackStoppedMessage.cs" />
+    <Compile Include="lavaplayer\remote\message\UnknownMessage.cs" />
+    <Compile Include="lavaplayer\remote\RemoteAudioTrackExecutor.cs" />
     <Compile Include="lavaplayer\remote\RemoteNode.cs" />
     <Compile Include="lavaplayer\remote\RemoteNodeManager.cs" />
+    <Compile Include="lavaplayer\remote\RemoteNodeProcessor.cs" />
     <Compile Include="lavaplayer\remote\RemoteNodeRegistry.cs" />
     <Compile Include="lavaplayer\source\AudioSourceManager.cs" />
+    <Compile Include="lavaplayer\tools\DaemonThreadFactory.cs" />
     <Compile Include="lavaplayer\tools\DecodedException.cs" />
     <Compile Include="lavaplayer\tools\ExceptionTools.cs" />
     <Compile Include="lavaplayer\tools\FriendlyException.cs" />
     <Compile Include="lavaplayer\tools\io\HttpConfigurable.cs" />
     <Compile Include="lavaplayer\tools\io\HttpInterface.cs" />
     <Compile Include="lavaplayer\tools\io\HttpInterfaceManager.cs" />
+    <Compile Include="lavaplayer\tools\io\MessageInput.cs" />
+    <Compile Include="lavaplayer\tools\io\MessageOutput.cs" />
     <Compile Include="lavaplayer\track\AudioItem.cs" />
     <Compile Include="lavaplayer\track\AudioPlaylist.cs" />
     <Compile Include="lavaplayer\track\AudioReference.cs" />
@@ -998,6 +1030,7 @@
     <Compile Include="lavaplayer\track\playback\AudioFrameBuffer.cs" />
     <Compile Include="lavaplayer\track\playback\AudioFrameConsumer.cs" />
     <Compile Include="lavaplayer\track\playback\AudioFrameProvider.cs" />
+    <Compile Include="lavaplayer\track\playback\AudioFrameProviderTools.cs" />
     <Compile Include="lavaplayer\track\playback\AudioFrameRebuilder.cs" />
     <Compile Include="lavaplayer\track\playback\AudioProcessingContext.cs" />
     <Compile Include="lavaplayer\track\playback\AudioTrackExecutor.cs" />
@@ -1018,19 +1051,22 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="AbandonedTrackManager.java" />
     <Content Include="AudioPlayer.java" />
-    <Content Include="AudioPlayerManager.java" />
     <Content Include="AudioSourceManagers.java" />
     <Content Include="DefaultAudioPlayerManager.java" />
     <Content Include="ExceptionTools.java" />
     <Content Include="HttpInterface.java" />
-    <Content Include="HttpInterfaceManager.java" />
     <Content Include="lavaplayer\apache\Apache.HttpClient\Apache.HttpClient.csproj" />
     <Content Include="lavaplayer\apache\Apache.HttpCore\Apache.HttpCore.csproj" />
     <Content Include="lavaplayer\apache\Apache.HttpCore\Apache.sln" />
-    <Content Include="RemoteNode.java" />
+    <Content Include="MessageInput.java" />
+    <Content Include="MessageOutput.java" />
+    <Content Include="RemoteAudioTrackExecutor.java" />
+    <Content Include="RemoteMessageMapper.java" />
     <Content Include="RemoteNodeManager.java" />
     <Content Include="RemoteNodeProcessor.java" />
+    <Content Include="TrackStartRequestCodec.java" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

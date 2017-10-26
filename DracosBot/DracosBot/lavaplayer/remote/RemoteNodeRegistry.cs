@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using System.Collections.Generic;
-
 namespace com.sedmelluq.discord.lavaplayer.remote
 {
     using AudioTrack = com.sedmelluq.discord.lavaplayer.track.AudioTrack;

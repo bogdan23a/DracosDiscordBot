@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using System.Collections.Generic;
-
 namespace com.sedmelluq.discord.lavaplayer.remote
 {
     using NodeStatisticsMessage = com.sedmelluq.discord.lavaplayer.remote.message.NodeStatisticsMessage;
@@ -39,7 +37,7 @@ namespace com.sedmelluq.discord.lavaplayer.remote
         /// <param name="reset"> Whether to reset the history so next calls will only contain new ones. </param>
         /// <returns> All the ticks in the history, up to the history capacity. In case of an overflow, newer ones will replace
         ///         older ones. </returns>
-        IList<RemoteNode_Tick> getLastTicks(bool reset);
+        IList<Tick> getLastTicks(bool reset);
 
         /// <returns> The number of tracks being played by this player manager through this node. </returns>
         int PlayingTrackCount { get; }
@@ -58,49 +56,49 @@ namespace com.sedmelluq.discord.lavaplayer.remote
         bool isPlayingTrack(AudioTrack track);
 
     }
-    internal class Tick
-        {
-            /// <summary>
-            /// The time when the node processor started building the request to send to the node.
-            /// </summary>
-            public readonly long startTime;
-            /// <summary>
-            /// The time when the processing the response data from the node was finished.
-            /// </summary>
-            public readonly long endTime;
-            /// <summary>
-            /// Response code from the node. -1 in case of connection failure.
-            /// </summary>
-            public readonly int responseCode;
-            /// <summary>
-            /// The size of the request in bytes.
-            /// </summary>
-            public readonly int requestSize;
-            /// <summary>
-            /// The size of the uncompressed response in bytes.
-            /// </summary>
-            public readonly int responseSize;
-
-            /// <param name="startTime"> The time when the node processor started building the request to send to the node. </param>
-            /// <param name="endTime"> The time when the processing the response data from the node was finished. </param>
-            /// <param name="responseCode"> Response code from the node. -1 in case of connection failure. </param>
-            /// <param name="requestSize"> The size of the request in bytes. </param>
-            /// <param name="responseSize"> The size of the uncompressed response in bytes. </param>
-            public Tick(long startTime, long endTime, int responseCode, int requestSize, int responseSize)
-            {
-                this.startTime = startTime;
-                this.endTime = endTime;
-                this.responseCode = responseCode;
-                this.requestSize = requestSize;
-                this.responseSize = responseSize;
-            }
-        }
-
-
+    public class Tick
+    {
         /// <summary>
-        /// State of the connection to this node.
+        /// The time when the node processor started building the request to send to the node.
         /// </summary>
-        internal sealed class ConnectionState
+        public readonly long startTime;
+        /// <summary>
+        /// The time when the processing the response data from the node was finished.
+        /// </summary>
+        public readonly long endTime;
+        /// <summary>
+        /// Response code from the node. -1 in case of connection failure.
+        /// </summary>
+        public readonly int responseCode;
+        /// <summary>
+        /// The size of the request in bytes.
+        /// </summary>
+        public readonly int requestSize;
+        /// <summary>
+        /// The size of the uncompressed response in bytes.
+        /// </summary>
+        public readonly int responseSize;
+
+        /// <param name="startTime"> The time when the node processor started building the request to send to the node. </param>
+        /// <param name="endTime"> The time when the processing the response data from the node was finished. </param>
+        /// <param name="responseCode"> Response code from the node. -1 in case of connection failure. </param>
+        /// <param name="requestSize"> The size of the request in bytes. </param>
+        /// <param name="responseSize"> The size of the uncompressed response in bytes. </param>
+        public Tick(long startTime, long endTime, int responseCode, int requestSize, int responseSize)
+        {
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.responseCode = responseCode;
+            this.requestSize = requestSize;
+            this.responseSize = responseSize;
+        }
+    }
+
+
+    /// <summary>
+    /// State of the connection to this node.
+    /// </summary>
+    public sealed class ConnectionState
     {
         /// <summary>
         /// The node processor is current in the middle of attempting a connection to this node. Happens on every

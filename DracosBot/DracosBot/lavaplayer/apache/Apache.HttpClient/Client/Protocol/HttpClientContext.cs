@@ -29,6 +29,11 @@ using Apache.Http.Conn.Routing;
 using Apache.Http.Cookie;
 using Apache.Http.Protocol;
 using Sharpen;
+using Org.Apache.Http.Protocol;
+using System;
+using Org.Apache.Http.Config;
+using System.Linq;
+using static java.lang.invoke.MethodHandles;
 
 namespace Apache.Http.Client.Protocol
 {
@@ -180,9 +185,9 @@ namespace Apache.Http.Client.Protocol
 			return GetAttribute<HttpRoute>(HttpRoute);
 		}
 
-		public virtual IList<URI> GetRedirectLocations()
+		public virtual IList<Uri> GetRedirectLocations()
 		{
-			return GetAttribute<IList>(RedirectLocations);
+			return GetAttribute<IList<Uri>>(RedirectLocations);
 		}
 
 		public virtual CookieStore GetCookieStore()
@@ -208,7 +213,7 @@ namespace Apache.Http.Client.Protocol
 		private Lookup<T> GetLookup<T>(string name)
 		{
 			System.Type clazz = typeof(T);
-			return GetAttribute<Lookup>(name);
+			return GetAttribute<Lookup<T>>(name);
 		}
 
 		public virtual Lookup<CookieSpecProvider> GetCookieSpecRegistry()
@@ -281,7 +286,7 @@ namespace Apache.Http.Client.Protocol
 		public virtual RequestConfig GetRequestConfig()
 		{
 			RequestConfig config = GetAttribute<RequestConfig>(RequestConfig);
-			return config != null ? config : RequestConfig.Default;
+			return config != null ? config : new RequestConfig.Builder().Build();
 		}
 
 		public virtual void SetRequestConfig(RequestConfig config)

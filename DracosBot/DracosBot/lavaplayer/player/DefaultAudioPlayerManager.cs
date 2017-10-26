@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using System.Collections.Generic;
 using java.util.concurrent;
+using java.util.concurrent.atomic;
 
 namespace com.sedmelluq.discord.lavaplayer.player
 {

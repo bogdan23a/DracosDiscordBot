@@ -26,13 +26,13 @@ using System.Text;
 using Apache.Http;
 using Apache.Http.Client.Config;
 using Sharpen;
+using Org.Apache.Http;
 
 namespace Apache.Http.Client.Config
 {
 	public class RequestConfig : ICloneable
 	{
-		public static readonly Apache.Http.Client.Config.RequestConfig Default = new RequestConfig.Builder
-			().Build();
+		public Apache.Http.Client.Config.RequestConfig Default = new RequestConfig.Builder().Build();
 
 		private readonly bool expectContinueEnabled;
 
@@ -319,11 +319,11 @@ namespace Apache.Http.Client.Config
 		}
 
 		/// <exception cref="Sharpen.CloneNotSupportedException"></exception>
-		protected internal virtual Apache.Http.Client.Config.RequestConfig Clone()
+		public virtual Apache.Http.Client.Config.RequestConfig Clone()
 		{
-			return (Apache.Http.Client.Config.RequestConfig)base.Clone();
+			return (Apache.Http.Client.Config.RequestConfig)base.MemberwiseClone();
 		}
-
+        
 		public override string ToString()
 		{
 			StringBuilder builder = new StringBuilder();
@@ -368,7 +368,12 @@ namespace Apache.Http.Client.Config
 				());
 		}
 
-		public class Builder
+        object ICloneable.Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public class Builder
 		{
 			private bool expectContinueEnabled;
 

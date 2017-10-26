@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using System;
+using Sharpen;
 
 namespace com.sedmelluq.discord.lavaplayer.player
 {
@@ -15,7 +14,7 @@ namespace com.sedmelluq.discord.lavaplayer.player
     using MessageOutput = com.sedmelluq.discord.lavaplayer.tools.io.MessageOutput;
     using AudioTrack = com.sedmelluq.discord.lavaplayer.track.AudioTrack;
     using DecodedTrackHolder = com.sedmelluq.discord.lavaplayer.track.DecodedTrackHolder;
-    using RequestConfig = org.apache.http.client.config.RequestConfig;
+    using RequestConfig = Apache.Http.Client.HttpRequestRetryHandler;
 
 
     /// <summary>
@@ -72,7 +71,7 @@ namespace com.sedmelluq.discord.lavaplayer.player
         /// <returns> A future for this operation </returns>
         //JAVA TO C# CONVERTER WARNING: 'final' parameters are not available in .NET:
         //ORIGINAL LINE: java.util.concurrent.Future<Void> loadItem(final String identifier, final AudioLoadResultHandler resultHandler);
-        Future<T> loadItem(string identifier, AudioLoadResultHandler resultHandler);
+        Future<System.Type> loadItem(string identifier, AudioLoadResultHandler resultHandler);
 
         /// <summary>
         /// Schedules loading a track or playlist with the specified identifier with an ordering key so that items with the
@@ -85,7 +84,7 @@ namespace com.sedmelluq.discord.lavaplayer.player
         /// <returns> A future for this operation </returns>
         //JAVA TO C# CONVERTER WARNING: 'final' parameters are not available in .NET:
         //ORIGINAL LINE: java.util.concurrent.Future<Void> loadItemOrdered(Object orderingKey, final String identifier, final AudioLoadResultHandler resultHandler);
-        Future<T> loadItemOrdered(object orderingKey, string identifier, AudioLoadResultHandler resultHandler);
+        Future<System.Type> loadItemOrdered(object orderingKey, string identifier, AudioLoadResultHandler resultHandler);
 
         /// <summary>
         /// Encode a track into an output stream. If the decoder is not supposed to know the number of tracks in advance, then

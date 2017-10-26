@@ -207,7 +207,7 @@ namespace com.sedmelluq.discord.lavaplayer.tools
         //ORIGINAL LINE: private static void encodeStackTrace(DataOutput output, Throwable throwable) throws IOException
         private static void encodeStackTrace(DataOutput output, System.Exception throwable)
         {
-            StackTraceElement[] trace = throwable.;
+            StackTraceElement[] trace = throwable.StackTrace;
             output.writeInt(trace.Length);
 
             foreach (StackTrace element in trace)

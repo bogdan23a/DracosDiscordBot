@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 namespace com.sedmelluq.discord.lavaplayer.tools.io
 {
-    using RequestConfig = HttpClient.;
+    using RequestConfig = HttpClient;
 
     /// <summary>
     /// Represents a class where HTTP request configuration can be changed.

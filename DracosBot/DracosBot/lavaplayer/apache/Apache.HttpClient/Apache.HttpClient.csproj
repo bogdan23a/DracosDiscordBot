@@ -1,0 +1,706 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4171BD52-757C-49FA-9EDF-D1647CAA5E4B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Apache.HttpClient</RootNamespace>
+    <AssemblyName>Apache.HttpClient</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\Couchbase.Lite\packages\ICSharpCode.SharpZipLib.dll.0.85.4.369\lib\net20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Sharpen\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Sharpen\AList.cs">
+      <Link>Sharpen\AList.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\AbstractCollection.cs">
+      <Link>Sharpen\AbstractCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\AbstractList.cs">
+      <Link>Sharpen\AbstractList.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\AbstractMap.cs">
+      <Link>Sharpen\AbstractMap.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\AbstractSet.cs">
+      <Link>Sharpen\AbstractSet.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\AccessController.cs">
+      <Link>Sharpen\AccessController.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Arrays.cs">
+      <Link>Sharpen\Arrays.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\AtomicBoolean.cs">
+      <Link>Sharpen\AtomicBoolean.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\AtomicInteger.cs">
+      <Link>Sharpen\AtomicInteger.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\AtomicLong.cs">
+      <Link>Sharpen\AtomicLong.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\AtomicReference.cs">
+      <Link>Sharpen\AtomicReference.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\AtomicReferenceArray.cs">
+      <Link>Sharpen\AtomicReferenceArray.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Authenticator.cs">
+      <Link>Sharpen\Authenticator.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\BitSet.cs">
+      <Link>Sharpen\BitSet.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\BufferedInputStream.cs">
+      <Link>Sharpen\BufferedInputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\BufferedOutputStream.cs">
+      <Link>Sharpen\BufferedOutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\BufferedReader.cs">
+      <Link>Sharpen\BufferedReader.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\BufferedWriter.cs">
+      <Link>Sharpen\BufferedWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ByteArrayInputStream.cs">
+      <Link>Sharpen\ByteArrayInputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ByteArrayOutputStream.cs">
+      <Link>Sharpen\ByteArrayOutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ByteBuffer.cs">
+      <Link>Sharpen\ByteBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ByteOrder.cs">
+      <Link>Sharpen\ByteOrder.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\CRC32.cs">
+      <Link>Sharpen\CRC32.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Callable.cs">
+      <Link>Sharpen\Callable.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Channels.cs">
+      <Link>Sharpen\Channels.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\CharBuffer.cs">
+      <Link>Sharpen\CharBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\CharSequence.cs">
+      <Link>Sharpen\CharSequence.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\CharUtils.cs">
+      <Link>Sharpen\CharUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\CharsetDecoder.cs">
+      <Link>Sharpen\CharsetDecoder.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\CharsetEncoder.cs">
+      <Link>Sharpen\CharsetEncoder.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\CodingErrorAction.cs">
+      <Link>Sharpen\CodingErrorAction.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Collections.cs">
+      <Link>Sharpen\Collections.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ConcurrentHashMap.cs">
+      <Link>Sharpen\ConcurrentHashMap.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ConcurrentMap.cs">
+      <Link>Sharpen\ConcurrentMap.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\CopyOnWriteArrayList.cs">
+      <Link>Sharpen\CopyOnWriteArrayList.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\CountDownLatch.cs">
+      <Link>Sharpen\CountDownLatch.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\CyclicBarrier.cs">
+      <Link>Sharpen\CyclicBarrier.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\DataConverter.cs">
+      <Link>Sharpen\DataConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\DateFormat.cs">
+      <Link>Sharpen\DateFormat.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\DeflaterOutputStream.cs">
+      <Link>Sharpen\DeflaterOutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\DigestInputStream.cs">
+      <Link>Sharpen\DigestInputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\DigestOutputStream.cs">
+      <Link>Sharpen\DigestOutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\EnumSet.cs">
+      <Link>Sharpen\EnumSet.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\EnumerableWrapper.cs">
+      <Link>Sharpen\EnumerableWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\EnumeratorWrapper.cs">
+      <Link>Sharpen\EnumeratorWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Exceptions.cs">
+      <Link>Sharpen\Exceptions.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Executor.cs">
+      <Link>Sharpen\Executor.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ExecutorService.cs">
+      <Link>Sharpen\ExecutorService.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Executors.cs">
+      <Link>Sharpen\Executors.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Extensions.cs">
+      <Link>Sharpen\Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FileChannel.cs">
+      <Link>Sharpen\FileChannel.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FileHelper.cs">
+      <Link>Sharpen\FileHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FileInputStream.cs">
+      <Link>Sharpen\FileInputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FileLock.cs">
+      <Link>Sharpen\FileLock.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FileOutputStream.cs">
+      <Link>Sharpen\FileOutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FilePath.cs">
+      <Link>Sharpen\FilePath.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FileReader.cs">
+      <Link>Sharpen\FileReader.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FileWriter.cs">
+      <Link>Sharpen\FileWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FilenameFilter.cs">
+      <Link>Sharpen\FilenameFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FilterInputStream.cs">
+      <Link>Sharpen\FilterInputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\FilterOutputStream.cs">
+      <Link>Sharpen\FilterOutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Future.cs">
+      <Link>Sharpen\Future.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\GZIPInputStream.cs">
+      <Link>Sharpen\GZIPInputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\GZIPOutputStream.cs">
+      <Link>Sharpen\GZIPOutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\HttpURLConnection.cs">
+      <Link>Sharpen\HttpURLConnection.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\InflaterInputStream.cs">
+      <Link>Sharpen\InflaterInputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\InheritableThreadLocal.cs">
+      <Link>Sharpen\InheritableThreadLocal.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\InputStream.cs">
+      <Link>Sharpen\InputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\InputStreamReader.cs">
+      <Link>Sharpen\InputStreamReader.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Iterable.cs">
+      <Link>Sharpen\Iterable.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Iterator.cs">
+      <Link>Sharpen\Iterator.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\JavaCalendar.cs">
+      <Link>Sharpen\JavaCalendar.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\LinkageError.cs">
+      <Link>Sharpen\LinkageError.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\LinkedHashMap.cs">
+      <Link>Sharpen\LinkedHashMap.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\LinkedHashSet.cs">
+      <Link>Sharpen\LinkedHashSet.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ListIterator.cs">
+      <Link>Sharpen\ListIterator.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\MappedByteBuffer.cs">
+      <Link>Sharpen\MappedByteBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Matcher.cs">
+      <Link>Sharpen\Matcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\MessageDigest.cs">
+      <Link>Sharpen\MessageDigest.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\MessageFormat.cs">
+      <Link>Sharpen\MessageFormat.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ObjectInputStream.cs">
+      <Link>Sharpen\ObjectInputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ObjectOutputStream.cs">
+      <Link>Sharpen\ObjectOutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Observable.cs">
+      <Link>Sharpen\Observable.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\OutputStream.cs">
+      <Link>Sharpen\OutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\OutputStreamWriter.cs">
+      <Link>Sharpen\OutputStreamWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\PasswordAuthentication.cs">
+      <Link>Sharpen\PasswordAuthentication.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Pattern.cs">
+      <Link>Sharpen\Pattern.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\PipedInputStream.cs">
+      <Link>Sharpen\PipedInputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\PipedOutputStream.cs">
+      <Link>Sharpen\PipedOutputStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\PrintWriter.cs">
+      <Link>Sharpen\PrintWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\PrivilegedAction.cs">
+      <Link>Sharpen\PrivilegedAction.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Process.cs">
+      <Link>Sharpen\Process.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Proxy.cs">
+      <Link>Sharpen\Proxy.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ProxySelector.cs">
+      <Link>Sharpen\ProxySelector.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\RandomAccessFile.cs">
+      <Link>Sharpen\RandomAccessFile.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ReentrantLock.cs">
+      <Link>Sharpen\ReentrantLock.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Reference.cs">
+      <Link>Sharpen\Reference.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ReferenceQueue.cs">
+      <Link>Sharpen\ReferenceQueue.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ResourceBundle.cs">
+      <Link>Sharpen\ResourceBundle.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Runnable.cs">
+      <Link>Sharpen\Runnable.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Runtime.cs">
+      <Link>Sharpen\Runtime.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\SSLContext.cs">
+      <Link>Sharpen\SSLContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ScheduledThreadPoolExecutor.cs">
+      <Link>Sharpen\ScheduledThreadPoolExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\SimpleDateFormat.cs">
+      <Link>Sharpen\SimpleDateFormat.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\SingletonList.cs">
+      <Link>Sharpen\SingletonList.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\SoftReference.cs">
+      <Link>Sharpen\SoftReference.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\StackOverflowError.cs">
+      <Link>Sharpen\StackOverflowError.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\String.cs">
+      <Link>Sharpen\String.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\StringTokenizer.cs">
+      <Link>Sharpen\StringTokenizer.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\SynchronizedList.cs">
+      <Link>Sharpen\SynchronizedList.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Thread.cs">
+      <Link>Sharpen\Thread.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ThreadFactory.cs">
+      <Link>Sharpen\ThreadFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\ThreadPoolExecutor.cs">
+      <Link>Sharpen\ThreadPoolExecutor.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\TimeUnit.cs">
+      <Link>Sharpen\TimeUnit.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\TreeSet.cs">
+      <Link>Sharpen\TreeSet.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\TrustManager.cs">
+      <Link>Sharpen\TrustManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\URLEncoder.cs">
+      <Link>Sharpen\URLEncoder.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\Uri.cs">
+      <Link>Sharpen\Uri.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\WeakReference.cs">
+      <Link>Sharpen\WeakReference.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\WrappedSystemStream.cs">
+      <Link>Sharpen\WrappedSystemStream.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\X509Certificate.cs">
+      <Link>Sharpen\X509Certificate.cs</Link>
+    </Compile>
+    <Compile Include="..\Sharpen\X509TrustManager.cs">
+      <Link>Sharpen\X509TrustManager.cs</Link>
+    </Compile>
+    <Compile Include="Auth\AUTH.cs" />
+    <Compile Include="Auth\AuthOption.cs" />
+    <Compile Include="Auth\AuthProtocolState.cs" />
+    <Compile Include="Auth\AuthScheme.cs" />
+    <Compile Include="Auth\AuthSchemeFactory.cs" />
+    <Compile Include="Auth\AuthSchemeProvider.cs" />
+    <Compile Include="Auth\AuthSchemeRegistry.cs" />
+    <Compile Include="Auth\AuthScope.cs" />
+    <Compile Include="Auth\AuthState.cs" />
+    <Compile Include="Auth\AuthenticationException.cs" />
+    <Compile Include="Auth\BasicUserPrincipal.cs" />
+    <Compile Include="Auth\ChallengeState.cs" />
+    <Compile Include="Auth\ContextAwareAuthScheme.cs" />
+    <Compile Include="Auth\Credentials.cs" />
+    <Compile Include="Auth\InvalidCredentialsException.cs" />
+    <Compile Include="Auth\MalformedChallengeException.cs" />
+    <Compile Include="Auth\NTCredentials.cs" />
+    <Compile Include="Auth\NTUserPrincipal.cs" />
+    <Compile Include="Auth\UsernamePasswordCredentials.cs" />
+    <Compile Include="Auth\Params\AuthPNames.cs" />
+    <Compile Include="Client\AuthCache.cs" />
+    <Compile Include="Client\AuthenticationStrategy.cs" />
+    <Compile Include="Client\BackoffManager.cs" />
+    <Compile Include="Client\CircularRedirectException.cs" />
+    <Compile Include="Client\ClientProtocolException.cs" />
+    <Compile Include="Client\ConnectionBackoffStrategy.cs" />
+    <Compile Include="Client\CookieStore.cs" />
+    <Compile Include="Client\CredentialsProvider.cs" />
+    <Compile Include="Client\HttpClient.cs" />
+    <Compile Include="Client\HttpRequestRetryHandler.cs" />
+    <Compile Include="Client\HttpResponseException.cs" />
+    <Compile Include="Client\NonRepeatableRequestException.cs" />
+    <Compile Include="Client\RedirectException.cs" />
+    <Compile Include="Client\RedirectStrategy.cs" />
+    <Compile Include="Client\ResponseHandler.cs" />
+    <Compile Include="Client\ServiceUnavailableRetryStrategy.cs" />
+    <Compile Include="Client\UserTokenHandler.cs" />
+    <Compile Include="Client\Config\AuthSchemes.cs" />
+    <Compile Include="Client\Config\CookieSpecs.cs" />
+    <Compile Include="Client\Config\RequestConfig.cs" />
+    <Compile Include="Client\Entity\DecompressingEntity.cs" />
+    <Compile Include="Client\Entity\DeflateDecompressingEntity.cs" />
+    <Compile Include="Client\Entity\DeflateInputStream.cs" />
+    <Compile Include="Client\Entity\EntityBuilder.cs" />
+    <Compile Include="Client\Entity\GzipCompressingEntity.cs" />
+    <Compile Include="Client\Entity\GzipDecompressingEntity.cs" />
+    <Compile Include="Client\Entity\LazyDecompressingInputStream.cs" />
+    <Compile Include="Client\Entity\UrlEncodedFormEntity.cs" />
+    <Compile Include="Client\Methods\AbortableHttpRequest.cs" />
+    <Compile Include="Client\Methods\AbstractExecutionAwareRequest.cs" />
+    <Compile Include="Client\Methods\CloseableHttpResponse.cs" />
+    <Compile Include="Client\Methods\Configurable.cs" />
+    <Compile Include="Client\Methods\HttpDelete.cs" />
+    <Compile Include="Client\Methods\HttpEntityEnclosingRequestBase.cs" />
+    <Compile Include="Client\Methods\HttpExecutionAware.cs" />
+    <Compile Include="Client\Methods\HttpGet.cs" />
+    <Compile Include="Client\Methods\HttpOptions.cs" />
+    <Compile Include="Client\Methods\HttpPatch.cs" />
+    <Compile Include="Client\Methods\HttpPost.cs" />
+    <Compile Include="Client\Methods\HttpPut.cs" />
+    <Compile Include="Client\Methods\HttpRequestBase.cs" />
+    <Compile Include="Client\Methods\HttpRequestWrapper.cs" />
+    <Compile Include="Client\Methods\HttpTrace.cs" />
+    <Compile Include="Client\Methods\IHttpUriRequest.cs" />
+    <Compile Include="Client\Methods\RequestBuilder.cs" />
+    <Compile Include="Client\Params\AllClientPNames.cs" />
+    <Compile Include="Client\Params\ClientPNames.cs" />
+    <Compile Include="Client\Params\HttpClientParamConfig.cs" />
+    <Compile Include="Client\Protocol\HttpClientContext.cs" />
+    <Compile Include="Client\Protocol\RequestAcceptEncoding.cs" />
+    <Compile Include="Client\Protocol\RequestAddCookies.cs" />
+    <Compile Include="Client\Protocol\RequestAuthCache.cs" />
+    <Compile Include="Client\Protocol\RequestClientConnControl.cs" />
+    <Compile Include="Client\Protocol\RequestDefaultHeaders.cs" />
+    <Compile Include="Client\Protocol\RequestExpectContinue.cs" />
+    <Compile Include="Client\Protocol\ResponseContentEncoding.cs" />
+    <Compile Include="Client\Protocol\ResponseProcessCookies.cs" />
+    <Compile Include="Client\Utils\CloneUtils.cs" />
+    <Compile Include="Client\Utils\DateUtils.cs" />
+    <Compile Include="Client\Utils\HttpClientUtils.cs" />
+    <Compile Include="Client\Utils\Idn.cs" />
+    <Compile Include="Client\Utils\JdkIdn.cs" />
+    <Compile Include="Client\Utils\Punycode.cs" />
+    <Compile Include="Client\Utils\Rfc3492Idn.cs" />
+    <Compile Include="Client\Utils\URIBuilder.cs" />
+    <Compile Include="Client\Utils\URIUtils.cs" />
+    <Compile Include="Client\Utils\URLEncodedUtils.cs" />
+    <Compile Include="Conn\ClientConnectionManager.cs" />
+    <Compile Include="Conn\ClientConnectionRequest.cs" />
+    <Compile Include="Conn\ConnectTimeoutException.cs" />
+    <Compile Include="Conn\ConnectionKeepAliveStrategy.cs" />
+    <Compile Include="Conn\ConnectionPoolTimeoutException.cs" />
+    <Compile Include="Conn\ConnectionReleaseTrigger.cs" />
+    <Compile Include="Conn\ConnectionRequest.cs" />
+    <Compile Include="Conn\DnsResolver.cs" />
+    <Compile Include="Conn\EofSensorInputStream.cs" />
+    <Compile Include="Conn\EofSensorWatcher.cs" />
+    <Compile Include="Conn\HttpClientConnectionManager.cs" />
+    <Compile Include="Conn\HttpConnectionFactory.cs" />
+    <Compile Include="Conn\HttpHostConnectException.cs" />
+    <Compile Include="Conn\HttpInetSocketAddress.cs" />
+    <Compile Include="Conn\HttpRoutedConnection.cs" />
+    <Compile Include="Conn\ManagedClientConnection.cs" />
+    <Compile Include="Conn\ManagedHttpClientConnection.cs" />
+    <Compile Include="Conn\SchemePortResolver.cs" />
+    <Compile Include="Conn\UnsupportedSchemeException.cs" />
+    <Compile Include="Conn\Params\ConnConnectionPNames.cs" />
+    <Compile Include="Conn\Params\ConnManagerPNames.cs" />
+    <Compile Include="Conn\Params\ConnRoutePNames.cs" />
+    <Compile Include="Conn\Routing\BasicRouteDirector.cs" />
+    <Compile Include="Conn\Routing\HttpRoute.cs" />
+    <Compile Include="Conn\Routing\HttpRouteDirector.cs" />
+    <Compile Include="Conn\Routing\HttpRoutePlanner.cs" />
+    <Compile Include="Conn\Routing\RouteInfo.cs" />
+    <Compile Include="Conn\Routing\RouteTracker.cs" />
+    <Compile Include="Conn\Scheme\LayeredSchemeSocketFactory.cs" />
+    <Compile Include="Conn\Scheme\LayeredSocketFactory.cs" />
+    <Compile Include="Conn\Scheme\LayeredSocketFactoryAdaptor.cs" />
+    <Compile Include="Conn\Scheme\Scheme.cs" />
+    <Compile Include="Conn\Scheme\SchemeLayeredSocketFactory.cs" />
+    <Compile Include="Conn\Scheme\SchemeLayeredSocketFactoryAdaptor.cs" />
+    <Compile Include="Conn\Scheme\SchemeLayeredSocketFactoryAdaptor2.cs" />
+    <Compile Include="Conn\Scheme\SchemeRegistry.cs" />
+    <Compile Include="Conn\Scheme\SchemeSocketFactory.cs" />
+    <Compile Include="Conn\Scheme\SchemeSocketFactoryAdaptor.cs" />
+    <Compile Include="Conn\Scheme\SocketFactory.cs" />
+    <Compile Include="Conn\Scheme\SocketFactoryAdaptor.cs" />
+    <Compile Include="Conn\Socket\ConnectionSocketFactory.cs" />
+    <Compile Include="Conn\Socket\LayeredConnectionSocketFactory.cs" />
+    <Compile Include="Conn\Socket\PlainConnectionSocketFactory.cs" />
+    <Compile Include="Conn\Ssl\AbstractVerifier.cs" />
+    <Compile Include="Conn\Ssl\AllowAllHostnameVerifier.cs" />
+    <Compile Include="Conn\Ssl\BrowserCompatHostnameVerifier.cs" />
+    <Compile Include="Conn\Ssl\PrivateKeyDetails.cs" />
+    <Compile Include="Conn\Ssl\PrivateKeyStrategy.cs" />
+    <Compile Include="Conn\Ssl\SSLConnectionSocketFactory.cs" />
+    <Compile Include="Conn\Ssl\SSLContextBuilder.cs" />
+    <Compile Include="Conn\Ssl\SSLContexts.cs" />
+    <Compile Include="Conn\Ssl\SSLInitializationException.cs" />
+    <Compile Include="Conn\Ssl\StrictHostnameVerifier.cs" />
+    <Compile Include="Conn\Ssl\TrustSelfSignedStrategy.cs" />
+    <Compile Include="Conn\Ssl\TrustStrategy.cs" />
+    <Compile Include="Conn\Ssl\X509HostnameVerifier.cs" />
+    <Compile Include="Conn\Util\InetAddressUtils.cs" />
+    <Compile Include="Cookie\ClientCookie.cs" />
+    <Compile Include="Cookie\Cookie.cs" />
+    <Compile Include="Cookie\CookieAttributeHandler.cs" />
+    <Compile Include="Cookie\CookieIdentityComparator.cs" />
+    <Compile Include="Cookie\CookieOrigin.cs" />
+    <Compile Include="Cookie\CookiePathComparator.cs" />
+    <Compile Include="Cookie\CookieRestrictionViolationException.cs" />
+    <Compile Include="Cookie\CookieSpec.cs" />
+    <Compile Include="Cookie\CookieSpecFactory.cs" />
+    <Compile Include="Cookie\CookieSpecProvider.cs" />
+    <Compile Include="Cookie\CookieSpecRegistry.cs" />
+    <Compile Include="Cookie\MalformedCookieException.cs" />
+    <Compile Include="Cookie\SM.cs" />
+    <Compile Include="Cookie\SetCookie.cs" />
+    <Compile Include="Cookie\SetCookie2.cs" />
+    <Compile Include="Cookie\Params\CookieSpecPNames.cs" />
+    <Compile Include="Impl\Auth\AuthSchemeBase.cs" />
+    <Compile Include="Impl\Auth\BasicScheme.cs" />
+    <Compile Include="Impl\Auth\BasicSchemeFactory.cs" />
+    <Compile Include="Impl\Auth\DigestScheme.cs" />
+    <Compile Include="Impl\Auth\DigestSchemeFactory.cs" />
+    <Compile Include="Impl\Auth\GGSSchemeBase.cs" />
+    <Compile Include="Impl\Auth\HttpAuthenticator.cs" />
+    <Compile Include="Impl\Auth\HttpEntityDigester.cs" />
+    <Compile Include="Impl\Auth\KerberosScheme.cs" />
+    <Compile Include="Impl\Auth\KerberosSchemeFactory.cs" />
+    <Compile Include="Impl\Auth\NTLMEngine.cs" />
+    <Compile Include="Impl\Auth\NTLMEngineException.cs" />
+    <Compile Include="Impl\Auth\NTLMEngineImpl.cs" />
+    <Compile Include="Impl\Auth\NTLMScheme.cs" />
+    <Compile Include="Impl\Auth\NTLMSchemeFactory.cs" />
+    <Compile Include="Impl\Auth\RFC2617Scheme.cs" />
+    <Compile Include="Impl\Auth\SPNegoScheme.cs" />
+    <Compile Include="Impl\Auth\SPNegoSchemeFactory.cs" />
+    <Compile Include="Impl\Auth\UnsupportedDigestAlgorithmException.cs" />
+    <Compile Include="Impl\Client\AIMDBackoffManager.cs" />
+    <Compile Include="Impl\Client\AuthenticationStrategyImpl.cs" />
+    <Compile Include="Impl\Client\BasicAuthCache.cs" />
+    <Compile Include="Impl\Client\BasicCookieStore.cs" />
+    <Compile Include="Impl\Client\BasicCredentialsProvider.cs" />
+    <Compile Include="Impl\Client\BasicResponseHandler.cs" />
+    <Compile Include="Impl\Client\Clock.cs" />
+    <Compile Include="Impl\Client\CloseableHttpClient.cs" />
+    <Compile Include="Impl\Client\CloseableHttpResponseProxy.cs" />
+    <Compile Include="Impl\Client\DefaultBackoffStrategy.cs" />
+    <Compile Include="Impl\Client\DefaultConnectionKeepAliveStrategy.cs" />
+    <Compile Include="Impl\Client\DefaultHttpRequestRetryHandler.cs" />
+    <Compile Include="Impl\Client\DefaultRedirectStrategy.cs" />
+    <Compile Include="Impl\Client\DefaultServiceUnavailableRetryStrategy.cs" />
+    <Compile Include="Impl\Client\DefaultUserTokenHandler.cs" />
+    <Compile Include="Impl\Client\EntityEnclosingRequestWrapper.cs" />
+    <Compile Include="Impl\Client\FutureRequestExecutionMetrics.cs" />
+    <Compile Include="Impl\Client\FutureRequestExecutionService.cs" />
+    <Compile Include="Impl\Client\HttpClientBuilder.cs" />
+    <Compile Include="Impl\Client\HttpClients.cs" />
+    <Compile Include="Impl\Client\HttpRequestFutureTask.cs" />
+    <Compile Include="Impl\Client\HttpRequestTaskCallable.cs" />
+    <Compile Include="Impl\Client\InternalHttpClient.cs" />
+    <Compile Include="Impl\Client\LaxRedirectStrategy.cs" />
+    <Compile Include="Impl\Client\MinimalHttpClient.cs" />
+    <Compile Include="Impl\Client\NoopUserTokenHandler.cs" />
+    <Compile Include="Impl\Client\NullBackoffStrategy.cs" />
+    <Compile Include="Impl\Client\ProxyAuthenticationStrategy.cs" />
+    <Compile Include="Impl\Client\ProxyClient.cs" />
+    <Compile Include="Impl\Client\RedirectLocations.cs" />
+    <Compile Include="Impl\Client\RequestWrapper.cs" />
+    <Compile Include="Impl\Client\StandardHttpRequestRetryHandler.cs" />
+    <Compile Include="Impl\Client\SystemClock.cs" />
+    <Compile Include="Impl\Client\SystemDefaultCredentialsProvider.cs" />
+    <Compile Include="Impl\Client\TargetAuthenticationStrategy.cs" />
+    <Compile Include="Impl\Conn\BasicHttpClientConnectionManager.cs" />
+    <Compile Include="Impl\Conn\CPool.cs" />
+    <Compile Include="Impl\Conn\CPoolEntry.cs" />
+    <Compile Include="Impl\Conn\CPoolProxy.cs" />
+    <Compile Include="Impl\Conn\ConnectionShutdownException.cs" />
+    <Compile Include="Impl\Conn\DefaultHttpResponseParser.cs" />
+    <Compile Include="Impl\Conn\DefaultHttpResponseParserFactory.cs" />
+    <Compile Include="Impl\Conn\DefaultManagedHttpClientConnection.cs" />
+    <Compile Include="Impl\Conn\DefaultProxyRoutePlanner.cs" />
+    <Compile Include="Impl\Conn\DefaultRoutePlanner.cs" />
+    <Compile Include="Impl\Conn\DefaultSchemePortResolver.cs" />
+    <Compile Include="Impl\Conn\HttpClientConnectionOperator.cs" />
+    <Compile Include="Impl\Conn\InMemoryDnsResolver.cs" />
+    <Compile Include="Impl\Conn\LoggingInputStream.cs" />
+    <Compile Include="Impl\Conn\LoggingManagedHttpClientConnection.cs" />
+    <Compile Include="Impl\Conn\LoggingOutputStream.cs" />
+    <Compile Include="Impl\Conn\ManagedHttpClientConnectionFactory.cs" />
+    <Compile Include="Impl\Conn\PoolingHttpClientConnectionManager.cs" />
+    <Compile Include="Impl\Conn\SystemDefaultDnsResolver.cs" />
+    <Compile Include="Impl\Conn\SystemDefaultRoutePlanner.cs" />
+    <Compile Include="Impl\Conn\Wire.cs" />
+    <Compile Include="Impl\Cookie\AbstractCookieAttributeHandler.cs" />
+    <Compile Include="Impl\Cookie\AbstractCookieSpec.cs" />
+    <Compile Include="Impl\Cookie\BasicClientCookie.cs" />
+    <Compile Include="Impl\Cookie\BasicClientCookie2.cs" />
+    <Compile Include="Impl\Cookie\BasicCommentHandler.cs" />
+    <Compile Include="Impl\Cookie\BasicDomainHandler.cs" />
+    <Compile Include="Impl\Cookie\BasicExpiresHandler.cs" />
+    <Compile Include="Impl\Cookie\BasicMaxAgeHandler.cs" />
+    <Compile Include="Impl\Cookie\BasicPathHandler.cs" />
+    <Compile Include="Impl\Cookie\BasicSecureHandler.cs" />
+    <Compile Include="Impl\Cookie\BestMatchSpec.cs" />
+    <Compile Include="Impl\Cookie\BestMatchSpecFactory.cs" />
+    <Compile Include="Impl\Cookie\BrowserCompatSpec.cs" />
+    <Compile Include="Impl\Cookie\BrowserCompatSpecFactory.cs" />
+    <Compile Include="Impl\Cookie\BrowserCompatVersionAttributeHandler.cs" />
+    <Compile Include="Impl\Cookie\CookieSpecBase.cs" />
+    <Compile Include="Impl\Cookie\DateParseException.cs" />
+    <Compile Include="Impl\Cookie\IgnoreSpec.cs" />
+    <Compile Include="Impl\Cookie\IgnoreSpecFactory.cs" />
+    <Compile Include="Impl\Cookie\NetscapeDomainHandler.cs" />
+    <Compile Include="Impl\Cookie\NetscapeDraftHeaderParser.cs" />
+    <Compile Include="Impl\Cookie\NetscapeDraftSpec.cs" />
+    <Compile Include="Impl\Cookie\NetscapeDraftSpecFactory.cs" />
+    <Compile Include="Impl\Cookie\PublicSuffixFilter.cs" />
+    <Compile Include="Impl\Cookie\PublicSuffixListParser.cs" />
+    <Compile Include="Impl\Cookie\RFC2109DomainHandler.cs" />
+    <Compile Include="Impl\Cookie\RFC2109Spec.cs" />
+    <Compile Include="Impl\Cookie\RFC2109SpecFactory.cs" />
+    <Compile Include="Impl\Cookie\RFC2109VersionHandler.cs" />
+    <Compile Include="Impl\Cookie\RFC2965CommentUrlAttributeHandler.cs" />
+    <Compile Include="Impl\Cookie\RFC2965DiscardAttributeHandler.cs" />
+    <Compile Include="Impl\Cookie\RFC2965DomainAttributeHandler.cs" />
+    <Compile Include="Impl\Cookie\RFC2965PortAttributeHandler.cs" />
+    <Compile Include="Impl\Cookie\RFC2965Spec.cs" />
+    <Compile Include="Impl\Cookie\RFC2965SpecFactory.cs" />
+    <Compile Include="Impl\Cookie\RFC2965VersionAttributeHandler.cs" />
+    <Compile Include="Impl\Execchain\BackoffStrategyExec.cs" />
+    <Compile Include="Impl\Execchain\ClientExecChain.cs" />
+    <Compile Include="Impl\Execchain\ConnectionHolder.cs" />
+    <Compile Include="Impl\Execchain\MainClientExec.cs" />
+    <Compile Include="Impl\Execchain\MinimalClientExec.cs" />
+    <Compile Include="Impl\Execchain\ProtocolExec.cs" />
+    <Compile Include="Impl\Execchain\Proxies.cs" />
+    <Compile Include="Impl\Execchain\RedirectExec.cs" />
+    <Compile Include="Impl\Execchain\RequestAbortedException.cs" />
+    <Compile Include="Impl\Execchain\RequestEntityExecHandler.cs" />
+    <Compile Include="Impl\Execchain\ResponseEntityWrapper.cs" />
+    <Compile Include="Impl\Execchain\ResponseProxyHandler.cs" />
+    <Compile Include="Impl\Execchain\RetryExec.cs" />
+    <Compile Include="Impl\Execchain\ServiceUnavailableRetryExec.cs" />
+    <Compile Include="Impl\Execchain\TunnelRefusedException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Apache.HttpCore\Apache.HttpCore.csproj">
+      <Project>{A8AD6859-7139-4A3D-8354-A93674AB8BB5}</Project>
+      <Name>Apache.HttpCore</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

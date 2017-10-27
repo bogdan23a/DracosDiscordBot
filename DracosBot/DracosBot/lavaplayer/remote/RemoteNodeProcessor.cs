@@ -37,7 +37,10 @@ using Microsoft.Extensions.Logging;
 using java.util.concurrent;
 using System.Threading;
 using Sharpen;
-
+using java.lang;
+using System.IO;
+using java.io;
+using Severity = com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity;
 
 namespace com.sedmelluq.discord.lavaplayer.remote
 {
@@ -167,7 +170,7 @@ namespace com.sedmelluq.discord.lavaplayer.remote
                 return;
             }
 
-            log.debug("Trying to connect to node {}.", nodeAddress);
+            log.LogDebug("Trying to connect to node {}.", nodeAddress);
 
             connectionState.set(ConnectionState.PENDING.id());
 
@@ -179,30 +182,30 @@ namespace com.sedmelluq.discord.lavaplayer.remote
 
                     while (processOneTick(httpInterface, timingAverage))
                     {
-                        aliveTickCounter = Math.Max(1, aliveTickCounter + 1);
+                        aliveTickCounter = System.Math.Max(1, aliveTickCounter + 1);
                         lastAliveTime = DateTimeHelperClass.CurrentUnixTimeMillis();
                     }
                 }
             }
             catch (InterruptedException)
             {
-                log.info("Node {} processing was stopped.", nodeAddress);
-                Thread.CurrentThread.Interrupt();
+                log.LogInformation("Node {} processing was stopped.", nodeAddress);
+                System.Threading.Thread.CurrentThread.Interrupt();
             }
             catch (IOException e)
             {
                 if (aliveTickCounter > 0)
                 {
-                    log.error("Node {} went offline with exception.", nodeAddress, e);
+                    log.LogError("Node {} went offline with exception.", nodeAddress, e);
                 }
                 else
                 {
-                    log.debug("Retry, node {} is still offline.", nodeAddress);
+                    log.LogDebug("Retry, node {} is still offline.", nodeAddress);
                 }
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
-                log.error("Node {} appears offline due to unexpected exception.", nodeAddress, e);
+                log.LogError("Node {} appears offline due to unexpected exception.", nodeAddress, e);
 
                 ExceptionTools.rethrowErrors(e);
             }
@@ -211,7 +214,7 @@ namespace com.sedmelluq.discord.lavaplayer.remote
                 processHealthCheck(true);
                 connectionState.set(ConnectionState.OFFLINE.id());
 
-                aliveTickCounter = Math.Min(-1, aliveTickCounter - 1);
+                aliveTickCounter = System.Math.Min(-1, aliveTickCounter - 1);
                 threadRunning.set(false);
 
                 if (!closed)
@@ -220,14 +223,14 @@ namespace com.sedmelluq.discord.lavaplayer.remote
 
                     if (aliveTickCounter == -1)
                     {
-                        log.info("Node {} loop ended, retry scheduled in {}.", nodeAddress, delay);
+                        log.LogInformation("Node {} loop ended, retry scheduled in {}.", nodeAddress, delay);
                     }
 
                     scheduledExecutor.schedule(this, delay, TimeUnit.MILLISECONDS);
                 }
                 else
                 {
-                    log.info("Node {} loop ended, node was removed.", nodeAddress);
+                    log.LogInformation("Node {} loop ended, node was removed.", nodeAddress);
                 }
             }
         }
@@ -258,532 +261,500 @@ namespace com.sedmelluq.discord.lavaplayer.remote
         //	This class is used to replace calls to Java's System.currentTimeMillis with the C# equivalent.
         //	Unix time is defined as the number of seconds that have elapsed since midnight UTC, 1 January 1970.
         //---------------------------------------------------------------------------------------------------------
-        internal static class DateTimeHelperClass
+        public static class DateTimeHelperClass
         {
-            private static readonly System.DateTime Jan1st1970 = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
-            internal static long CurrentUnixTimeMillis()
+            public static readonly DateTime Jan1st1970 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            public static long CurrentUnixTimeMillis()
             {
-                return (long)(System.DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
+                return (long)(DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
             }
         }
-    using System;
-using System.Collections.Generic;
-using System.Threading;
 
-//JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
-//ORIGINAL LINE: private boolean processOneTick(HttpInterface httpInterface, RingBufferMath timingAverage) throws Exception
- private bool processOneTick(HttpInterface httpInterface, RingBufferMath timingAverage)
-    {
-        TickBuilder tickBuilder = new TickBuilder(DateTimeHelperClass.CurrentUnixTimeMillis());
-
-        try
+        //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
+        //ORIGINAL LINE: private boolean processOneTick(HttpInterface httpInterface, RingBufferMath timingAverage) throws Exception
+        private bool processOneTick(HttpInterface httpInterface, RingBufferMath timingAverage)
         {
-            if (!dispatchOneTick(httpInterface, tickBuilder))
+            TickBuilder tickBuilder = new TickBuilder(DateTimeHelperClass.CurrentUnixTimeMillis());
+
+            try
             {
+                if (!dispatchOneTick(httpInterface, tickBuilder))
+                {
+                    return false;
+                }
+            }
+            finally
+            {
+                tickBuilder.endTime = DateTimeHelperClass.CurrentUnixTimeMillis();
+                recordTick(tickBuilder.build(), timingAverage);
+            }
+
+            long sleepDuration = System.Math.Max((tickBuilder.startTime + 500) - tickBuilder.endTime, 10);
+
+            System.Threading.Thread.Sleep((int)sleepDuration);
+            return true;
+        }
+
+        //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
+        //ORIGINAL LINE: private boolean dispatchOneTick(HttpInterface httpInterface, TickBuilder tickBuilder) throws Exception
+        private bool dispatchOneTick(HttpInterface httpInterface, TickBuilder tickBuilder)
+        {
+            bool success = false;
+            HttpPost post = new HttpPost("http://" + nodeAddress + "/tick");
+
+            abandonedTrackManager.distribute(Collections.singletonList(this));
+
+            ByteArrayEntity entity = new ByteArrayEntity(buildRequestBody());
+            post.GetEntity() = entity;
+
+            tickBuilder.requestSize = (int)entity.ContentLength;
+
+            CloseableHttpResponse response = httpInterface.execute(post);
+
+            try
+            {
+                tickBuilder.responseCode = response.StatusLine.StatusCode;
+                if (tickBuilder.responseCode != 200)
+                {
+                    throw new IOException("Returned an unexpected response code " + tickBuilder.responseCode);
+                }
+
+                if (connectionState.compareAndSet(ConnectionState.PENDING.id(), ConnectionState.ONLINE.id()))
+                {
+                    log.LogInformation("Node {} came online.", nodeAddress);
+                }
+                else if (connectionState.Get() != ConnectionState.ONLINE.id())
+                {
+                    log.LogWarning("Node {} received successful response, but had already lost control of its tracks.", nodeAddress);
+                    return false;
+                }
+
+                lastAliveTime = DateTimeHelperClass.CurrentUnixTimeMillis();
+
+                if (!handleResponseBody(response.Entity.Content, tickBuilder))
+                {
+                    return false;
+                }
+
+                success = true;
+            }
+            finally
+            {
+                if (!success)
+                {
+                    IOUtils.closeQuietly(response);
+                }
+                else
+                {
+                    IOUtils.closeQuietly(response.Entity.Content);
+                }
+            }
+
+            return true;
+        }
+
+        //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
+        //ORIGINAL LINE: private byte[] buildRequestBody() throws IOException
+        private sbyte[] buildRequestBody()
+        {
+            ByteArrayOutputStream outputBytes = new ByteArrayOutputStream();
+            DataOutputStream output = new DataOutputStream(outputBytes);
+
+            IList<RemoteMessage> messages = new List<RemoteMessage>();
+            int queuedCount = queuedMessages.drainTo(messages);
+
+            if (queuedCount > 0)
+            {
+                log.LogDebug("Including {} queued messages in the request to {}.", queuedCount, nodeAddress);
+            }
+
+            foreach (RemoteAudioTrackExecutor executor in playingTracks.values())
+            {
+                java.util.concurrent.atomic.AtomicLong pendingSeek = executor.PendingSeek;
+
+                AudioFrameBuffer buffer = executor.AudioBuffer;
+                int neededFrames = pendingSeek.equals(-1) ? buffer.RemainingCapacity : buffer.FullCapacity;
+
+                messages.Add(new TrackFrameRequestMessage(executor.ExecutorId, neededFrames, executor.Volume,long.Parse(pendingSeek.toString())));
+            }
+
+            foreach (RemoteMessage message in messages)
+            {
+                mapper.encode(output, message);
+            }
+
+            mapper.endOutput(output);
+            return outputBytes.toByteArray();
+        }
+
+
+        private bool handleResponseBody(Discord.Audio.Streams.InputStream inputStream, TickBuilder tickBuilder)
+        {
+            CountingInputStream countingStream = new CountingInputStream(inputStream);
+            DataInputStream input = new DataInputStream(countingStream);
+            RemoteMessage message;
+
+            try
+            {
+                while ((message = mapper.decode(input)) != null)
+                {
+                    if (message is TrackStartResponseMessage)
+                    {
+                        handleTrackStartResponse((TrackStartResponseMessage)message);
+                    }
+                    else if (message is TrackFrameDataMessage)
+                    {
+                        handleTrackFrameData((TrackFrameDataMessage)message);
+                    }
+                    else if (message is TrackExceptionMessage)
+                    {
+                        handleTrackException((TrackExceptionMessage)message);
+                    }
+                    else if (message is NodeStatisticsMessage)
+                    {
+                        handleNodeStatistics((NodeStatisticsMessage)message);
+                    }
+                }
+            }
+            catch (InterruptedException)
+            {
+                log.LogError("Node {} processing thread was interrupted.", nodeAddress);
+                System.Threading.Thread.CurrentThread.Interrupt();
                 return false;
             }
+            catch (System.Exception e)
+            {
+                log.LogError("Error when processing response from node {}.", nodeAddress, e);
+                ExceptionTools.rethrowErrors(e);
+            }
+            finally
+            {
+                tickBuilder.responseSize = countingStream.Count;
+            }
+
+            return true;
         }
-        finally
+
+        private void handleTrackStartResponse(TrackStartResponseMessage message)
         {
-            tickBuilder.endTime = DateTimeHelperClass.CurrentUnixTimeMillis();
-            recordTick(tickBuilder.build(), timingAverage);
-        }
-
-        long sleepDuration = Math.Max((tickBuilder.startTime + 500) - tickBuilder.endTime, 10);
-
-        Thread.Sleep(sleepDuration);
-        return true;
-    }
-
-    //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
-    //ORIGINAL LINE: private boolean dispatchOneTick(HttpInterface httpInterface, TickBuilder tickBuilder) throws Exception
-    private bool dispatchOneTick(HttpInterface httpInterface, TickBuilder tickBuilder)
-    {
-        bool success = false;
-        HttpPost post = new HttpPost("http://" + nodeAddress + "/tick");
-
-        abandonedTrackManager.distribute(Collections.singletonList(this));
-
-        ByteArrayEntity entity = new ByteArrayEntity(buildRequestBody());
-        post.Entity = entity;
-
-        tickBuilder.requestSize = (int)entity.ContentLength;
-
-        CloseableHttpResponse response = httpInterface.execute(post);
-
-        try
-        {
-            tickBuilder.responseCode = response.StatusLine.StatusCode;
-            if (tickBuilder.responseCode != 200)
+            if (message.success)
             {
-                throw new IOException("Returned an unexpected response code " + tickBuilder.responseCode);
-            }
-
-            if (connectionState.compareAndSet(ConnectionState.PENDING.id(), ConnectionState.ONLINE.id()))
-            {
-                log.info("Node {} came online.", nodeAddress);
-            }
-            else if (connectionState.get() != ConnectionState.ONLINE.id())
-            {
-                log.warn("Node {} received successful response, but had already lost control of its tracks.", nodeAddress);
-                return false;
-            }
-
-            lastAliveTime = DateTimeHelperClass.CurrentUnixTimeMillis();
-
-            if (!handleResponseBody(response.Entity.Content, tickBuilder))
-            {
-                return false;
-            }
-
-            success = true;
-        }
-        finally
-        {
-            if (!success)
-            {
-                IOUtils.closeQuietly(response);
+                log.LogDebug("Successful start confirmation from node {} for executor {}.", nodeAddress, message.executorId);
             }
             else
             {
-                IOUtils.closeQuietly(response.Entity.Content);
-            }
-        }
+                RemoteAudioTrackExecutor executor = playingTracks.Get(message.executorId);
 
-        return true;
-    }
-
-    //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
-    //ORIGINAL LINE: private byte[] buildRequestBody() throws IOException
-    private sbyte[] buildRequestBody()
-    {
-        ByteArrayOutputStream outputBytes = new ByteArrayOutputStream();
-        DataOutputStream output = new DataOutputStream(outputBytes);
-
-        IList<RemoteMessage> messages = new List<RemoteMessage>();
-        int queuedCount = queuedMessages.drainTo(messages);
-
-        if (queuedCount > 0)
-        {
-            log.debug("Including {} queued messages in the request to {}.", queuedCount, nodeAddress);
-        }
-
-        foreach (RemoteAudioTrackExecutor executor in playingTracks.values())
-        {
-            long pendingSeek = executor.PendingSeek;
-
-            AudioFrameBuffer buffer = executor.AudioBuffer;
-            int neededFrames = pendingSeek == -1 ? buffer.RemainingCapacity : buffer.FullCapacity;
-
-            messages.Add(new TrackFrameRequestMessage(executor.ExecutorId, neededFrames, executor.Volume, pendingSeek));
-        }
-
-        foreach (RemoteMessage message in messages)
-        {
-            mapper.encode(output, message);
-        }
-
-        mapper.endOutput(output);
-        return outputBytes.toByteArray();
-    }
-
-    //---------------------------------------------------------------------------------------------------------
-    //	Copyright © 2007 - 2017 Tangible Software Solutions Inc.
-    //	This class can be used by anyone provided that the copyright notice remains intact.
-    //
-    //	This class is used to replace calls to Java's System.currentTimeMillis with the C# equivalent.
-    //	Unix time is defined as the number of seconds that have elapsed since midnight UTC, 1 January 1970.
-    //---------------------------------------------------------------------------------------------------------
-    internal static class DateTimeHelperClass
-    {
-        private static readonly System.DateTime Jan1st1970 = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
-        internal static long CurrentUnixTimeMillis()
-        {
-            return (long)(System.DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
-        }
-    }
-
-    private bool handleResponseBody(InputStream inputStream, TickBuilder tickBuilder)
-    {
-        CountingInputStream countingStream = new CountingInputStream(inputStream);
-        DataInputStream input = new DataInputStream(countingStream);
-        RemoteMessage message;
-
-        try
-        {
-            while ((message = mapper.decode(input)) != null)
-            {
-                if (message is TrackStartResponseMessage)
+                if (executor != null)
                 {
-                    handleTrackStartResponse((TrackStartResponseMessage)message);
+                    executor.dispatchException(new FriendlyException("Remote machine failed to start track: " + message.failureReason, Severity.SUSPICIOUS, null));
+                    executor.stop();
                 }
-                else if (message is TrackFrameDataMessage)
+                else
                 {
-                    handleTrackFrameData((TrackFrameDataMessage)message);
-                }
-                else if (message is TrackExceptionMessage)
-                {
-                    handleTrackException((TrackExceptionMessage)message);
-                }
-                else if (message is NodeStatisticsMessage)
-                {
-                    handleNodeStatistics((NodeStatisticsMessage)message);
+                    log.LogDebug("Received failed track start for an already stopped executor {} from node {}.", message.executorId, nodeAddress);
                 }
             }
         }
-        catch (InterruptedException)
-        {
-            log.error("Node {} processing thread was interrupted.", nodeAddress);
-            Thread.CurrentThread.Interrupt();
-            return false;
-        }
-        catch (Exception e)
-        {
-            log.error("Error when processing response from node {}.", nodeAddress, e);
-            ExceptionTools.rethrowErrors(e);
-        }
-        finally
-        {
-            tickBuilder.responseSize = countingStream.Count;
-        }
 
-        return true;
-    }
-
-    private void handleTrackStartResponse(TrackStartResponseMessage message)
-    {
-        if (message.success)
-        {
-            log.debug("Successful start confirmation from node {} for executor {}.", nodeAddress, message.executorId);
-        }
-        else
+        //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
+        //ORIGINAL LINE: private void handleTrackFrameData(TrackFrameDataMessage message) throws Exception
+        private void handleTrackFrameData(TrackFrameDataMessage message)
         {
             RemoteAudioTrackExecutor executor = playingTracks.get(message.executorId);
 
             if (executor != null)
             {
-                executor.dispatchException(new FriendlyException("Remote machine failed to start track: " + message.failureReason, SUSPICIOUS, null));
-                executor.stop();
-            }
-            else
-            {
-                log.debug("Received failed track start for an already stopped executor {} from node {}.", message.executorId, nodeAddress);
-            }
-        }
-    }
-
-    //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
-    //ORIGINAL LINE: private void handleTrackFrameData(TrackFrameDataMessage message) throws Exception
-    private void handleTrackFrameData(TrackFrameDataMessage message)
-    {
-        RemoteAudioTrackExecutor executor = playingTracks.get(message.executorId);
-
-        if (executor != null)
-        {
-            if (message.seekedPosition >= 0)
-            {
-                executor.clearSeek(message.seekedPosition);
-            }
-
-            AudioFrameBuffer buffer = executor.AudioBuffer;
-            executor.receivedData();
-
-            AudioDataFormat format = executor.Configuration.OutputFormat;
-
-            foreach (AudioFrame frame in message.frames)
-            {
-                buffer.consume(new AudioFrame(frame.timecode, frame.data, frame.volume, format));
-            }
-
-            if (message.finished)
-            {
-                buffer.setTerminateOnEmpty();
-                trackEnded(executor, false);
-            }
-        }
-    }
-
-    private void handleTrackException(TrackExceptionMessage message)
-    {
-        RemoteAudioTrackExecutor executor = playingTracks.get(message.executorId);
-
-        if (executor != null)
-        {
-            executor.dispatchException(message.exception);
-        }
-    }
-
-    private void handleNodeStatistics(NodeStatisticsMessage message)
-    {
-        log.trace("Received stats from node: {} {} {} {}", message.playingTrackCount, message.totalTrackCount, message.processCpuUsage, message.systemCpuUsage);
-
-        lastStatistics = message;
-    }
-
-    /// <returns> An HTTP interface manager with appropriate timeouts for node requests. </returns>
-    public static HttpInterfaceManager createHttpInterfaceManager()
-    {
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setConnectionRequestTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
-
-        HttpClientBuilder builder = HttpClientTools.createSharedCookiesHttpBuilder();
-        builder.DefaultRequestConfig = requestConfig;
-        return new SimpleHttpInterfaceManager(builder, requestConfig);
-    }
-
-    /// <summary>
-    /// Check if there are any playing tracks on a node that has not shown signs of life in too long. In that case its
-    /// playing tracks will also be marked dead.
-    /// </summary>
-    /// <param name="terminate"> Whether to terminate without checking the threshold </param>
-    public virtual void processHealthCheck(bool terminate)
-    {
-        lock (this)
-        {
-            if (playingTracks.Empty || (!terminate && lastAliveTime >= DateTimeHelperClass.CurrentUnixTimeMillis() - TRACK_KILL_THRESHOLD))
-            {
-                return;
-            }
-
-            connectionState.set(ConnectionState.OFFLINE.id());
-
-            if (!terminate)
-            {
-                log.warn("Bringing node {} offline since last response from it was {}ms ago.", nodeAddress, DateTimeHelperClass.CurrentUnixTimeMillis() - lastAliveTime);
-            }
-
-            // There may be some racing that manages to add a track after this, it will be dealt with on the next iteration
-            foreach (long? executorId in new List<>(playingTracks.Keys))
-            {
-                RemoteAudioTrackExecutor executor = playingTracks.remove(executorId);
-
-                if (executor != null)
+                if (message.seekedPosition >= 0)
                 {
-                    abandonedTrackManager.add(executor);
+                    executor.clearSeek(message.seekedPosition);
+                }
+
+                AudioFrameBuffer buffer = executor.AudioBuffer;
+                executor.receivedData();
+
+                AudioDataFormat format = executor.Configuration.OutputFormat;
+
+                foreach (AudioFrame frame in message.frames)
+                {
+                    buffer.consume(new AudioFrame(frame.timecode, frame.data, frame.volume, format));
+                }
+
+                if (message.finished)
+                {
+                    buffer.setTerminateOnEmpty();
+                    trackEnded(executor, false);
                 }
             }
         }
-    }
 
-    private void recordTick(RemoteNode.Tick tick, RingBufferMath timingAverage)
-    {
-        timingAverage.add(tick.endTime - tick.startTime);
-        requestTimingPenalty = (int)((1450.0f / ((1450.0f - Math.Min(timingAverage.mean(), 1440)) / 30.0f)) - 30.0f);
-
-        lock (tickHistory)
+        private void handleTrackException(TrackExceptionMessage message)
         {
-            if (tickHistory.size() == NODE_REQUEST_HISTORY)
-            {
-                tickHistory.removeFirst();
-            }
+            RemoteAudioTrackExecutor executor = playingTracks.get(message.executorId);
 
-            tickHistory.addLast(tick);
-        }
-    }
-
-    public override string Address
-    {
-        get
-        {
-            return nodeAddress;
-        }
-    }
-
-    public override ConnectionState ConnectionState
-    {
-        get
-        {
-            if (closed)
+            if (executor != null)
             {
-                return ConnectionState.REMOVED;
-            }
-            else
-            {
-                return typeof(ConnectionState).EnumConstants[connectionState.get()];
+                executor.dispatchException(message.exception);
             }
         }
-    }
 
-    public override NodeStatisticsMessage LastStatistics
-    {
-        get
+        private void handleNodeStatistics(NodeStatisticsMessage message)
         {
-            return lastStatistics;
+            log.LogTrace("Received stats from node: {} {} {} {}", message.playingTrackCount, message.totalTrackCount, message.processCpuUsage, message.systemCpuUsage);
+
+            lastStatistics = message;
         }
-    }
 
-    public override int TickMinimumInterval
-    {
-        get
+        /// <returns> An HTTP interface manager with appropriate timeouts for node requests. </returns>
+        public static HttpInterfaceManager createHttpInterfaceManager()
         {
-            return TICK_MINIMUM_INTERVAL;
+            RequestConfig requestConfig = RequestConfig.Custom().SetConnectTimeout(CONNECT_TIMEOUT).SetConnectionRequestTimeout(CONNECT_TIMEOUT).SetSocketTimeout(SOCKET_TIMEOUT).build();
+
+            HttpClientBuilder builder = HttpClientTools.createSharedCookiesHttpBuilder();
+            builder.SetDefaultRequestConfig(requestConfig);
+            return new SimpleHttpInterfaceManager(builder, requestConfig);
         }
-    }
 
-    public override int TickHistoryCapacity
-    {
-        get
+        /// <summary>
+        /// Check if there are any playing tracks on a node that has not shown signs of life in too long. In that case its
+        /// playing tracks will also be marked dead.
+        /// </summary>
+        /// <param name="terminate"> Whether to terminate without checking the threshold </param>
+        public virtual void processHealthCheck(bool terminate)
         {
-            return NODE_REQUEST_HISTORY;
-        }
-    }
-
-    public override IList<Tick> getLastTicks(bool reset)
-    {
-        lock (tickHistory)
-        {
-            IList<Tick> result = new List<Tick>(tickHistory);
-
-            if (reset)
+            lock (this)
             {
-                tickHistory.clear();
+                if (playingTracks.Empty || (!terminate && lastAliveTime >= DateTimeHelperClass.CurrentUnixTimeMillis() - TRACK_KILL_THRESHOLD))
+                {
+                    return;
+                }
+
+                connectionState.set(ConnectionState.OFFLINE.id());
+
+                if (!terminate)
+                {
+                    log.LogWarning("Bringing node {} offline since last response from it was {}ms ago.", nodeAddress, DateTimeHelperClass.CurrentUnixTimeMillis() - lastAliveTime);
+                }
+
+                // There may be some racing that manages to add a track after this, it will be dealt with on the next iteration
+                foreach (long? executorId in new IList<RemoteAudioTrackExecutor>(playingTracks.Keys))
+                {
+                    RemoteAudioTrackExecutor executor = playingTracks.remove(executorId);
+
+                    if (executor != null)
+                    {
+                        abandonedTrackManager.add(executor);
+                    }
+                }
+            }
+        }
+
+        private void recordTick(Tick tick, RingBufferMath timingAverage)
+        {
+            timingAverage.add(tick.endTime - tick.startTime);
+            requestTimingPenalty = (int)((1450.0f / ((1450.0f - System.Math.Min(timingAverage.mean(), 1440)) / 30.0f)) - 30.0f);
+
+            lock (tickHistory)
+            {
+                if (tickHistory.Count == NODE_REQUEST_HISTORY)
+                {
+                    tickHistory.RemoveFirst();
+                }
+
+                tickHistory.AddLast(tick);
+            }
+        }
+
+        public string Address
+        {
+            get
+            {
+                return nodeAddress;
+            }
+        }
+
+        public ConnectionState ConnectionState
+        {
+            get
+            {
+                if (closed)
+                {
+                    return ConnectionState.REMOVED;
+                }
+                else
+                {
+                    return typeof(ConnectionState).EnumConstants[connectionState.get()];
+                }
+            }
+        }
+
+        public NodeStatisticsMessage LastStatistics
+        {
+            get
+            {
+                return lastStatistics;
+            }
+        }
+
+        public int TickMinimumInterval
+        {
+            get
+            {
+                return TICK_MINIMUM_INTERVAL;
+            }
+        }
+
+        public int TickHistoryCapacity
+        {
+            get
+            {
+                return NODE_REQUEST_HISTORY;
+            }
+        }
+
+        public IList<Tick> getLastTicks(bool reset)
+        {
+            lock (tickHistory)
+            {
+                IList<Tick> result = new List<Tick>(tickHistory);
+
+                if (reset)
+                {
+                    tickHistory.Clear();
+                }
+
+                return result;
+            }
+        }
+
+        public int PlayingTrackCount
+        {
+            get
+            {
+                return playingTracks.Count;
+            }
+        }
+
+        
+        public IList<AudioTrack> PlayingTracks
+        {
+            get
+            {
+                IList<AudioTrack> tracks = new List<AudioTrack>();
+
+                foreach (RemoteAudioTrackExecutor executor in playingTracks.Values)
+                {
+                    tracks.Add(executor.Track);
+                }
+
+                return tracks;
+            }
+        }
+
+        private bool isUnavailableForTracks(NodeStatisticsMessage statistics)
+        {
+            return statistics == null || connectionState.get() != ConnectionState.ONLINE.id();
+        }
+
+        private int getPenaltyForPlayingTracks(NodeStatisticsMessage statistics)
+        {
+            int count = statistics.playingTrackCount;
+            int penalty = System.Math.Min(count, 100);
+
+            if (count > 100)
+            {
+                penalty += int.Parse(System.Math.Pow(count - 100.0, 0.7).ToString());
             }
 
-            return result;
+            return penalty * 3 / 2;
         }
-    }
 
-    public override int PlayingTrackCount
-    {
-        get
+        private int getPenaltyForPausedTracks(NodeStatisticsMessage statistics)
         {
-            return playingTracks.size();
+            return statistics.totalTrackCount - statistics.playingTrackCount;
         }
-    }
 
-    //---------------------------------------------------------------------------------------------------------
-    //	Copyright © 2007 - 2017 Tangible Software Solutions Inc.
-    //	This class can be used by anyone provided that the copyright notice remains intact.
-    //
-    //	This class is used to replace calls to Java's System.currentTimeMillis with the C# equivalent.
-    //	Unix time is defined as the number of seconds that have elapsed since midnight UTC, 1 January 1970.
-    //---------------------------------------------------------------------------------------------------------
-    internal static class DateTimeHelperClass
-    {
-        private static readonly System.DateTime Jan1st1970 = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
-        internal static long CurrentUnixTimeMillis()
+        private int getPenaltyForCpuUsage(NodeStatisticsMessage statistics)
         {
-            return (long)(System.DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
+            return (int)((1.0f / ((1.0f - System.Math.Min(statistics.systemCpuUsage, 0.99f)) / 30.0f)) - 30.0f);
         }
-    }
 
-    public override IList<AudioTrack> PlayingTracks
-    {
-        get
+        public IDictionary<string, int?> BalancerPenaltyDetails
         {
-            IList<AudioTrack> tracks = new List<AudioTrack>();
-
-            foreach (RemoteAudioTrackExecutor executor in playingTracks.values())
+            get
             {
-                tracks.Add(executor.Track);
+                IDictionary<string, int?> details = new Dictionary<string, int?>();
+                NodeStatisticsMessage statistics = lastStatistics;
+
+                if (isUnavailableForTracks(statistics))
+                {
+                    details["unavailable"] = int.MaxValue;
+                }
+                else
+                {
+                    details["playing"] = getPenaltyForPlayingTracks(statistics);
+                    details["paused"] = getPenaltyForPausedTracks(statistics);
+                    details["cpu"] = getPenaltyForCpuUsage(statistics);
+                    details["timings"] = requestTimingPenalty;
+                }
+
+                int total = 0;
+                foreach (int value in details.Values)
+                {
+                    total += value;
+                }
+                details["total"] = total;
+
+                return details;
+            }
+        }
+
+        /// <returns> The penalty for load balancing. Node with the lowest value will receive the next track. </returns>
+        public virtual int BalancerPenalty
+        {
+            get
+            {
+                NodeStatisticsMessage statistics = lastStatistics;
+
+                if (isUnavailableForTracks(statistics))
+                {
+                    return int.MaxValue;
+                }
+
+                return getPenaltyForPlayingTracks(statistics) + getPenaltyForPausedTracks(statistics) + getPenaltyForCpuUsage(statistics) + requestTimingPenalty;
+            }
+        }
+
+        public bool isPlayingTrack(AudioTrack track)
+        {
+            AudioTrackExecutor executor = ((InternalAudioTrack)track).ActiveExecutor;
+
+            if (executor is RemoteAudioTrackExecutor)
+            {
+                return playingTracks.ContainsKey(((RemoteAudioTrackExecutor)executor).ExecutorId);
             }
 
-            return tracks;
-        }
-    }
-
-    private bool isUnavailableForTracks(NodeStatisticsMessage statistics)
-    {
-        return statistics == null || connectionState.get() != ConnectionState.ONLINE.id();
-    }
-
-    private int getPenaltyForPlayingTracks(NodeStatisticsMessage statistics)
-    {
-        int count = statistics.playingTrackCount;
-        int penalty = Math.Min(count, 100);
-
-        if (count > 100)
-        {
-            penalty += Math.Pow(count - 100.0, 0.7);
+            return false;
         }
 
-        return penalty * 3 / 2;
-    }
-
-    private int getPenaltyForPausedTracks(NodeStatisticsMessage statistics)
-    {
-        return statistics.totalTrackCount - statistics.playingTrackCount;
-    }
-
-    private int getPenaltyForCpuUsage(NodeStatisticsMessage statistics)
-    {
-        return (int)((1.0f / ((1.0f - Math.Min(statistics.systemCpuUsage, 0.99f)) / 30.0f)) - 30.0f);
-    }
-
-    public override IDictionary<string, int?> BalancerPenaltyDetails
-    {
-        get
+        class TickBuilder
         {
-            IDictionary<string, int?> details = new Dictionary<string, int?>();
-            NodeStatisticsMessage statistics = lastStatistics;
+            private readonly long startTime;
+            private long endTime;
+            private int responseCode;
+            private int requestSize;
+            private int responseSize;
 
-            if (isUnavailableForTracks(statistics))
+            private TickBuilder(long startTime)
             {
-                details["unavailable"] = int.MaxValue;
-            }
-            else
-            {
-                details["playing"] = getPenaltyForPlayingTracks(statistics);
-                details["paused"] = getPenaltyForPausedTracks(statistics);
-                details["cpu"] = getPenaltyForCpuUsage(statistics);
-                details["timings"] = requestTimingPenalty;
+                this.startTime = startTime;
+                this.responseCode = -1;
             }
 
-            int total = 0;
-            foreach (int value in details.Values)
+            private Tick build()
             {
-                total += value;
+                return new Tick(startTime, endTime, responseCode, requestSize, responseSize);
             }
-            details["total"] = total;
-
-            return details;
-        }
-    }
-
-    /// <returns> The penalty for load balancing. Node with the lowest value will receive the next track. </returns>
-    public virtual int BalancerPenalty
-    {
-        get
-        {
-            NodeStatisticsMessage statistics = lastStatistics;
-
-            if (isUnavailableForTracks(statistics))
-            {
-                return int.MaxValue;
-            }
-
-            return getPenaltyForPlayingTracks(statistics) + getPenaltyForPausedTracks(statistics) + getPenaltyForCpuUsage(statistics) + requestTimingPenalty;
-        }
-    }
-
-    public bool isPlayingTrack(AudioTrack track)
-    {
-        AudioTrackExecutor executor = ((InternalAudioTrack)track).ActiveExecutor;
-
-        if (executor is RemoteAudioTrackExecutor)
-        {
-            return playingTracks.containsKey(((RemoteAudioTrackExecutor)executor).ExecutorId);
-        }
-
-        return false;
-    }
-
-    class TickBuilder
-    {
-        private readonly long startTime;
-        private long endTime;
-        private int responseCode;
-        private int requestSize;
-        private int responseSize;
-
-        private TickBuilder(long startTime)
-        {
-            this.startTime = startTime;
-            this.responseCode = -1;
-        }
-
-        private Tick build()
-        {
-            return new Tick(startTime, endTime, responseCode, requestSize, responseSize);
         }
     }
 }

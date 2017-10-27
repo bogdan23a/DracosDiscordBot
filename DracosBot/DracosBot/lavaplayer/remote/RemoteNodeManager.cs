@@ -20,6 +20,9 @@ using AudioTrackExecutor = com.sedmelluq.discord.lavaplayer.track.playback.Audio
 //using IOUtils = Spring.Util.io;
 using com.sedmelluq.discord.lavaplayer.remote;
 using java.util.concurrent.atomic;
+using java.util.concurrent;
+using static com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+using com.sedmelluq.discord.lavaplayer.player;
 
 
 //JAVA TO C# CONVERTER TODO TASK: This Java 'import static' statement cannot be converted to C#:
@@ -30,7 +33,7 @@ using java.util.concurrent.atomic;
 /// </summary>
 public class RemoteNodeManager : AudioEventAdapter, RemoteNodeRegistry, ThreadStart
 {
-    
+
     private readonly DefaultAudioPlayerManager playerManager;
     private readonly HttpInterfaceManager httpInterfaceManager;
     private readonly IList<RemoteNodeProcessor> processors;
@@ -45,11 +48,11 @@ public class RemoteNodeManager : AudioEventAdapter, RemoteNodeRegistry, ThreadSt
     {
         this.playerManager = playerManager;
         this.httpInterfaceManager = RemoteNodeProcessor.createHttpInterfaceManager();
-        this.processors = new List<>();
+        this.processors = new List<RemoteNodeProcessor>();
         this.abandonedTrackManager = new AbandonedTrackManager();
         this.enabled = new AtomicBoolean();
         this.@lock = new object();
-        this.activeProcessors = new List<>();
+        this.activeProcessors = new List<RemoteNodeProcessor>();
     }
 
     /// <summary>
@@ -90,7 +93,7 @@ public class RemoteNodeManager : AudioEventAdapter, RemoteNodeRegistry, ThreadSt
                 processors.Add(processor);
             }
 
-            activeProcessors = new List<>(processors);
+            activeProcessors = new List<RemoteNodeProcessor>(processors);
         }
     }
 
@@ -115,8 +118,8 @@ public class RemoteNodeManager : AudioEventAdapter, RemoteNodeRegistry, ThreadSt
 
             abandonedTrackManager.shutdown();
 
-            processors.clear();
-            activeProcessors = new List<>(processors);
+            processors.Clear();
+            activeProcessors = new List<RemoteNodeProcessor>(processors);
         }
 
         if (terminal)
@@ -127,90 +130,95 @@ public class RemoteNodeManager : AudioEventAdapter, RemoteNodeRegistry, ThreadSt
 
     public bool Enabled
     {
-	return enabled.get();
+        get => enabled;
     }
 
-/// <summary>
-/// Start playing an audio track remotely. </summary>
-/// <param name="remoteExecutor"> The executor of the track </param>
-public void startPlaying(RemoteAudioTrackExecutor remoteExecutor)
-{
-    RemoteNodeProcessor processor = NodeForNextTrack;
 
-    processor.startPlaying(remoteExecutor);
-}
-
-private void startScheduler(int initialSize)
-{
-    ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(initialSize, new DaemonThreadFactory("remote"));
-    scheduledExecutor.scheduleAtFixedRate(this, 2000, 2000, TimeUnit.MILLISECONDS);
-    scheduler = scheduledExecutor;
-}
-
-private RemoteNodeProcessor NodeForNextTrack
-{
-	int lowestPenalty = int.MaxValue;
-    RemoteNodeProcessor node = null;
-
-	foreach (RemoteNodeProcessor processor in processors)
-
+    /// <summary>
+    /// Start playing an audio track remotely. </summary>
+    /// <param name="remoteExecutor"> The executor of the track </param>
+    public virtual void startPlaying(RemoteAudioTrackExecutor remoteExecutor)
     {
-        int penalty = processor.BalancerPenalty;
+        RemoteNodeProcessor processor = NodeForNextTrack;
 
-        if (penalty < lowestPenalty)
+        processor.startPlaying(remoteExecutor);
+    }
+
+    private void startScheduler(int initialSize)
+    {
+        ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(initialSize, new DaemonThreadFactory("remote"));
+        scheduledExecutor.scheduleAtFixedRate(this, 2000, 2000, TimeUnit.MILLISECONDS);
+        scheduler = scheduledExecutor;
+    }
+
+    private RemoteNodeProcessor NodeForNextTrack
+    {
+        get
         {
-            lowestPenalty = penalty;
-            node = processor;
+            int lowestPenalty = int.MaxValue;
+            RemoteNodeProcessor node = null;
+
+            foreach (RemoteNodeProcessor processor in processors)
+            {
+                int penalty = processor.BalancerPenalty;
+
+                if (penalty < lowestPenalty)
+                {
+                    lowestPenalty = penalty;
+                    node = processor;
+                }
+            }
+
+            if (node == null)
+            {
+                throw new FriendlyException("No available machines for playing track.", Severity.SUSPICIOUS, null);
+            }
+
+            return node;
         }
     }
 
-	if (node == null)
-
+    public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason)
     {
-        throw new FriendlyException("No available machines for playing track.", SUSPICIOUS, null);
+        AudioTrackExecutor executor = ((InternalAudioTrack)track).ActiveExecutor;
+
+        if (endReason != AudioTrackEndReason.FINISHED && executor is RemoteAudioTrackExecutor)
+        {
+            foreach (RemoteNodeProcessor processor in activeProcessors)
+            {
+                processor.trackEnded((RemoteAudioTrackExecutor)executor, true);
+            }
+        }
     }
 
-	return node;
-}
-
-public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason)
-{
-    AudioTrackExecutor executor = ((InternalAudioTrack)track).ActiveExecutor;
-
-    if (endReason != AudioTrackEndReason.FINISHED && executor is RemoteAudioTrackExecutor)
+    public void run()
     {
         foreach (RemoteNodeProcessor processor in activeProcessors)
         {
-            processor.trackEnded((RemoteAudioTrackExecutor)executor, true);
+            processor.processHealthCheck(false);
         }
-    }
-}
 
-public void run()
-{
-    foreach (RemoteNodeProcessor processor in activeProcessors)
-    {
-        processor.processHealthCheck(false);
+        abandonedTrackManager.drainExpired();
     }
 
-    abandonedTrackManager.drainExpired();
-}
-
-public RemoteNode getNodeUsedForTrack(AudioTrack track)
-{
-    foreach (RemoteNodeProcessor processor in activeProcessors)
+    public RemoteNode getNodeUsedForTrack(AudioTrack track)
     {
-        if (processor.isPlayingTrack(track))
+        foreach (RemoteNodeProcessor processor in activeProcessors)
         {
-            return processor;
+            if (processor.isPlayingTrack(track))
+            {
+                return processor;
+            }
         }
+
+        return null;
     }
 
-    return null;
-}
-
-public IList<RemoteNode> Nodes
-{
-	return new List<>(activeProcessors);
-  }
+    public  List<RemoteNode> Nodes
+    {
+        get
+        {
+            return new List<RemoteNode>(activeProcessors);
+        }
+    }
 }

@@ -73,7 +73,7 @@ namespace DracosBot
 
                 token = assumedToken;
                 if (hasTokenChanged)
-                    using (StreamWriter stream = new StreamWriter("myfile.txt"))
+                    using (StreamWriter stream = new StreamWriter("token.txt"))
                     {
                         stream.WriteLine(token);
                     }
@@ -136,6 +136,7 @@ namespace DracosBot
                 int gagCommand = Command.getIndex(Command.GAG_COMMANDS, message.Content);
                 //await message.Channel.SendMessageAsync("MEMAGE https://www.youtube.com/watch?v=-Qh41BTkqGU");
                 await message.Channel.SendFileAsync(Command.GAG_ANSWERS(gagCommand)[0]);
+                _9gagCommand.clickDreaptaDelete(Command.GAG_ANSWERS(gagCommand)[0]);
             }
         }
         private Task Log(LogMessage msg)

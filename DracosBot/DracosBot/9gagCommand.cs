@@ -9,7 +9,7 @@ using System.IO;
 
 namespace DracosBot
 {
-    class _9gagCommand
+    public class _9gagCommand
     {
         public static string[] commands = { "!9gaghot", "!9gagtrending", "!9gagfresh", "!9gagdelete" };
         private static string[] gagLink = { "https://9gag.com/hot", "https://9gag.com/trending", "https://9gag.com/fresh" };
@@ -62,15 +62,14 @@ namespace DracosBot
             }
             //saving paths of every photo downloaded
 
-            //photosPaths[photosPaths.Length] = ImgPatha;
+            photosPaths[photosPaths.Length] = ImgPatha;
 
             Console.Write(ImgPatha);
             return ImgPatha;
         }
-        static void deleteCache()
-        {   //delete all photos from cache
-            for (int i = 0; i < photosPaths.Length; i++)
-                File.Delete(photosPaths[i]);
+        public static void clickDreaptaDelete(string path)
+        {   //delete photos from cache
+            File.Delete(path);
         }
     }
 }

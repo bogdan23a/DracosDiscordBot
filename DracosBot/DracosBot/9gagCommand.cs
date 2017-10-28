@@ -5,23 +5,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace DracosBot
 {
     class _9gagCommand
     {
-        public static int Index;
-        public static string[] command = { "!9gaghot", "!9gagtrending", "!9gagfresh" };
-        public static string answer = GetRandIdHot(Index);
-        public static string[] GagLink = { "https://9gag.com/hot", "https://9gag.com/trending", "https://9gag.com/fresh" };
-        private static string GetRandIdHot(int Index)
+        public static string[] commands = { "!9gaghot", "!9gagtrending", "!9gagfresh", "!9gagdelete" };
+        private static string[] gagLink = { "https://9gag.com/hot", "https://9gag.com/trending", "https://9gag.com/fresh" };
+        private static string[] photosPaths;
+        public static string answer(int Index)
         {
-            WebClient GagUrl = new WebClient();
-            string GagSource = string.Empty;
-            string GagPostSource = string.Empty;
+            //tries to download html 9gag source
+            WebClient gagUrl = new WebClient();
+            string gagSource = string.Empty;
+            string gagPostSource = string.Empty;
             try
             {
-                GagSource = GagUrl.DownloadString(GagLink[Index]);
+                gagSource = gagUrl.DownloadString(gagLink[Index]);
+               
 
             }
             catch (Exception e)
@@ -29,28 +31,46 @@ namespace DracosBot
 
             }
 
+            //declare a model for searching a image source which is used in the next foreach
             string ArticleMatch = "img class=\"(.*?)\"(.*?)\"(.*?)\"";
+            //get a random number between 1 and 10 for downloading a random picture from 9gag
             Random randomGag = new Random();
             int randomGagint = randomGag.Next(1, 10);
             int IsRandomGag = 0;
-
-            foreach (Match match in Regex.Matches(GagSource, ArticleMatch))
+            //foreach match in the html source of page
+            foreach (Match match in Regex.Matches(gagSource, ArticleMatch))
             {
                 IsRandomGag++;
                 if (IsRandomGag == randomGagint)
-                {
-                    GagPostSource = match.Groups[3].Value;
+                {//get picture source
+                    gagPostSource = match.Groups[3].Value;
+                    
                     break;
                 }
             }
-            string ImgName = GagPostSource.Split('/')[4];
+            string ImgName = gagPostSource.Split('/')[4];
+           
             string ImgPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+          
             string ImgPatha = ImgPath.Remove(ImgPath.Length - 13) + ImgName;
-            using (GagUrl)
-            {
-                GagUrl.DownloadFile(new Uri(GagPostSource), ImgPatha);
+          
+            using (gagUrl)
+            {   //download the picture from the source in the debug file "ImgPatha"
+                
+                gagUrl.DownloadFile(new Uri(gagPostSource), ImgPatha);
+                
             }
+            //saving paths of every photo downloaded
+
+            //photosPaths[photosPaths.Length] = ImgPatha;
+
+            Console.Write(ImgPatha);
             return ImgPatha;
+        }
+        static void deleteCache()
+        {   //delete all photos from cache
+            for (int i = 0; i < photosPaths.Length; i++)
+                File.Delete(photosPaths[i]);
         }
     }
 }

@@ -969,7 +969,6 @@
     <Compile Include="lavaplayerSharp\player\AudioConfiguration.cs" />
     <Compile Include="lavaplayerSharp\player\AudioLoadResultHandler.cs" />
     <Compile Include="lavaplayerSharp\player\AudioPlayer.cs" />
-    <Compile Include="lavaplayerSharp\player\AudioPlayerLifecycleManager.cs" />
     <Compile Include="lavaplayerSharp\player\AudioPlayerManager.cs" />
     <Compile Include="lavaplayerSharp\player\DefaultAudioPlayerManager.cs" />
     <Compile Include="lavaplayerSharp\player\event\AudioEvent.cs" />
@@ -1010,17 +1009,14 @@
     <Compile Include="lavaplayerSharp\remote\RemoteNodeRegistry.cs" />
     <Compile Include="lavaplayerSharp\source\AudioSourceManager.cs" />
     <Compile Include="lavaplayerSharp\tools\DaemonThreadFactory.cs" />
-    <Compile Include="lavaplayerSharp\tools\DataFormatTools.cs" />
     <Compile Include="lavaplayerSharp\tools\DecodedException.cs" />
     <Compile Include="lavaplayerSharp\tools\ExceptionTools.cs" />
     <Compile Include="lavaplayerSharp\tools\FriendlyException.cs" />
-    <Compile Include="lavaplayerSharp\tools\GarbageCollectionMonitor.cs" />
     <Compile Include="lavaplayerSharp\tools\io\HttpConfigurable.cs" />
     <Compile Include="lavaplayerSharp\tools\io\HttpInterface.cs" />
     <Compile Include="lavaplayerSharp\tools\io\HttpInterfaceManager.cs" />
     <Compile Include="lavaplayerSharp\tools\io\MessageInput.cs" />
     <Compile Include="lavaplayerSharp\tools\io\MessageOutput.cs" />
-    <Compile Include="lavaplayerSharp\tools\OrderedExecutor.cs" />
     <Compile Include="lavaplayerSharp\track\AudioItem.cs" />
     <Compile Include="lavaplayerSharp\track\AudioPlaylist.cs" />
     <Compile Include="lavaplayerSharp\track\AudioReference.cs" />
@@ -1043,7 +1039,6 @@
     <Compile Include="lavaplayerSharp\track\TrackMarkerHandler.cs" />
     <Compile Include="lavaplayerSharp\track\TrackMarkerTracker.cs" />
     <Compile Include="lavaplayerSharp\track\TrackStateListener.cs" />
-    <Compile Include="Music\MusicHandler.cs" />
     <Compile Include="PingCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1052,40 +1047,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="lavaplayerSharp\.git\config" />
-    <None Include="lavaplayerSharp\.git\description" />
-    <None Include="lavaplayerSharp\.git\HEAD" />
-    <None Include="lavaplayerSharp\.git\hooks\applypatch-msg.sample" />
-    <None Include="lavaplayerSharp\.git\hooks\commit-msg.sample" />
-    <None Include="lavaplayerSharp\.git\hooks\post-update.sample" />
-    <None Include="lavaplayerSharp\.git\hooks\pre-applypatch.sample" />
-    <None Include="lavaplayerSharp\.git\hooks\pre-commit.sample" />
-    <None Include="lavaplayerSharp\.git\hooks\pre-push.sample" />
-    <None Include="lavaplayerSharp\.git\hooks\pre-rebase.sample" />
-    <None Include="lavaplayerSharp\.git\hooks\pre-receive.sample" />
-    <None Include="lavaplayerSharp\.git\hooks\prepare-commit-msg.sample" />
-    <None Include="lavaplayerSharp\.git\hooks\update.sample" />
-    <None Include="lavaplayerSharp\.git\index" />
-    <None Include="lavaplayerSharp\.git\info\exclude" />
-    <None Include="lavaplayerSharp\.git\logs\HEAD" />
-    <None Include="lavaplayerSharp\.git\logs\refs\heads\master" />
-    <None Include="lavaplayerSharp\.git\logs\refs\remotes\origin\HEAD" />
-    <None Include="lavaplayerSharp\.git\objects\pack\pack-261fe4545ed2786ecc96086b9e7ab5fc92cab645.idx" />
-    <None Include="lavaplayerSharp\.git\objects\pack\pack-261fe4545ed2786ecc96086b9e7ab5fc92cab645.pack" />
-    <None Include="lavaplayerSharp\.git\packed-refs" />
-    <None Include="lavaplayerSharp\.git\refs\heads\master" />
-    <None Include="lavaplayerSharp\.git\refs\remotes\origin\HEAD" />
-    <None Include="lavaplayerSharp\apache\Apache.HttpCore\packages.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AudioPlayerLifecycleManager.java" />
-    <Content Include="DataFormatTools.java" />
-    <Content Include="DefaultAudioPlayerManager.java" />
     <Content Include="lavaplayerSharp\apache\Apache.HttpClient\Apache.HttpClient.csproj" />
     <Content Include="lavaplayerSharp\apache\Apache.HttpCore\Apache.HttpCore.csproj" />
     <Content Include="lavaplayerSharp\apache\Apache.HttpCore\Apache.sln" />
-    <Content Include="OrderedExecutor.java" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="lavaplayerSharp\.git\objects\info\" />

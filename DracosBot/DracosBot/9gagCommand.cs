@@ -11,9 +11,10 @@ namespace DracosBot
 {
     public class _9gagCommand
     {
-        public static string[] commands = { "!9gaghot", "!9gagtrending", "!9gagfresh", "!9gagdelete" };
+        public static string[] commands = { "!9gaghot", "!9gagtrending", "!9gagfresh"};
         private static string[] gagLink = { "https://9gag.com/hot", "https://9gag.com/trending", "https://9gag.com/fresh" };
         private static string[] photosPaths;
+        private static string photoToDelete;
         public static string answer(int Index)
         {
             //tries to download html 9gag source
@@ -60,16 +61,16 @@ namespace DracosBot
                 gagUrl.DownloadFile(new Uri(gagPostSource), ImgPatha);
                 
             }
-            //saving paths of every photo downloaded
+            photoToDelete = ImgPatha;
 
-            photosPaths[photosPaths.Length] = ImgPatha;
-
-            Console.Write(ImgPatha);
+           
             return ImgPatha;
         }
-        public static void clickDreaptaDelete(string path)
+        public static void clickDreaptaDelete()
         {   //delete photos from cache
-            File.Delete(path);
+            Console.Write(photoToDelete);
+            File.Delete(photoToDelete);
+
         }
     }
 }

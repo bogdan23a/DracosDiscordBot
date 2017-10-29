@@ -136,7 +136,7 @@ namespace DracosBot
                 int gagCommand = Command.getIndex(Command.GAG_COMMANDS, message.Content);
                 //await message.Channel.SendMessageAsync("MEMAGE https://www.youtube.com/watch?v=-Qh41BTkqGU");
                 await message.Channel.SendFileAsync(Command.GAG_ANSWERS(gagCommand)[0]);
-                _9gagCommand.clickDreaptaDelete(Command.GAG_ANSWERS(gagCommand)[0]);
+                _9gagCommand.clickDreaptaDelete();
             }
         }
         private Task Log(LogMessage msg)
